@@ -30,11 +30,14 @@ module.exports = {
       refresh_token: {
         type: Sequelize.STRING,
       },
-      role_id: {
-        type: Sequelize.STRING,
-      },
-      wallet_id: {
-        type: Sequelize.STRING,
+      roleId: {
+        type: Sequelize.INTEGER,
+        references : {
+          model : {
+            tableName : 'Roles'
+          },
+          key : 'id'
+        }
       },
       createdAt: {
         allowNull: false,
