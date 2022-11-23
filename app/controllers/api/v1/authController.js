@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('../../../models');
+const { User } = require('../../../../models');
 
 const SALT = 10;
 
@@ -41,6 +41,7 @@ module.exports = {
     const user = await User.create({ email, encryptedPassword });
     res.status(201).json({
       id: user.id,
+      name: user.name,
       email: user.email,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
