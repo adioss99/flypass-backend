@@ -1,5 +1,5 @@
-const api = require('./api');
+const authController = require('./authController');
 
 module.exports = {
-  api,
+  authController,
 };

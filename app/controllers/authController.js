@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { User } = require('../../../../models');
+const { User } = require('../../models');
 
 const SALT = 10;
 
@@ -108,5 +108,22 @@ module.exports = {
         message: 'Unauthorized',
       });
     }
+  },
+  onLost(_req, res) {
+    res.status(404).json({
+      status: 'FAIL',
+      message: 'Route not found!',
+    });
+  },
+
+  // eslint-disable-next-line no-unused-vars
+  onError(err, _req, res, _next) {
+    res.status(500).json({
+      status: 'ERROR',
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   },
 };
