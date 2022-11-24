@@ -2,17 +2,23 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Airplanes', {
+    await queryInterface.createTable('Airports', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      iata: {
+        type: Sequelize.STRING
+      },
       name: {
         type: Sequelize.STRING
       },
-      airplaneCode: {
+      city: {
+        type: Sequelize.STRING
+      },
+      country: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -26,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Airplanes');
+    await queryInterface.dropTable('Airports');
   }
 };

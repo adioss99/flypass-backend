@@ -2,27 +2,42 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Airports', {
+    await queryInterface.createTable('Flights', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
-      },
-      iata: {
-        type: Sequelize.STRING
-      },
-      cityId: {
+      departureAirportId: {
         type: Sequelize.INTEGER,
         references:{
           model:{
-            tableName: 'Countries'
+            tableName:'Airports'
           },
-          key : 'id'
+          key: 'id'
         }
+      },
+      arrivalAirportId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airports'
+          },
+          key: 'id'
+        }
+      },
+      departureDate: {
+        type: Sequelize.DATE
+      },
+      arrivalDate: {
+        type: Sequelize.DATE
+      },
+      duration: {
+        type: Sequelize.TIME
+      },
+      flightTypeId: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +50,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Airports');
+    await queryInterface.dropTable('Flights');
   }
 };
