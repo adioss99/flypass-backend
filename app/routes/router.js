@@ -8,6 +8,8 @@ Router.get(
   controllers.authController.authorize,
   controllers.authController.whoAmI,
 );
+
+Router.get('/v1/logout', controllers.authController.logout);
 Router.post('/v1/login', controllers.authController.login);
 Router.post('/v1/register', controllers.authController.register);
 

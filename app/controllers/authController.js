@@ -1,5 +1,8 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validationResult = require('express-validator');
 const { User } = require('../../models');
 
 const SALT = 10;
@@ -11,7 +14,6 @@ function encryptPassword(password) {
         reject(err);
         return;
       }
-
       resolve(encryptedPassword);
     });
   });
@@ -24,7 +26,6 @@ function checkPassword(encryptedPassword, password) {
         reject(err);
         return;
       }
-
       resolve(isPasswordCorrect);
     });
   });
@@ -37,15 +38,21 @@ function createToken(payload) {
 module.exports = {
   async register(req, res) {
     const { email } = req.body;
+    const confrimPassowrd = req.body;
     const encryptedPassword = await encryptPassword(req.body.password);
-    const user = await User.create({ email, encryptedPassword });
+    const user = await User.create({ email, encryptedPassword, confrimPassowrd });
     res.status(201).json({
       id: user.id,
       name: user.name,
       email: user.email,
+      confrimPassowrd: user.confrimPassowrd,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
+    const errors = validationResult(req);
+    if (!errors.isEmpty(confrimPassowrd)) {
+      return res.status(400).json({ errors: errors.array() });
+    }
   },
 
   async login(req, res) {
@@ -70,7 +77,6 @@ module.exports = {
       res.status(401).json({ message: 'Password salah!' });
       return;
     }
-
     const token = createToken({
       id: user.id,
       email: user.email,
@@ -88,6 +94,11 @@ module.exports = {
   },
 
   async whoAmI(req, res) {
+    res.status(200).json(req.user);
+  },
+
+  async logout(req, res) {
+    req.logout();
     res.status(200).json(req.user);
   },
 
@@ -115,8 +126,6 @@ module.exports = {
       message: 'Route not found!',
     });
   },
-
-  // eslint-disable-next-line no-unused-vars
   onError(err, _req, res, _next) {
     res.status(500).json({
       status: 'ERROR',
