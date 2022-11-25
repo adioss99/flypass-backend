@@ -6,6 +6,8 @@ module.exports = {
     const timestamp = new Date()
     await queryInterface.bulkInsert('Flights',[
       {
+        airlineId : 1,
+        airplaneId : 1,
         departureAirportId: 1,
         arrivalAirportId: 2,
         departureDate: timestamp,
@@ -16,6 +18,8 @@ module.exports = {
         updatedAt : timestamp,
      },
      {
+      airlineId : 1,
+      airplaneId : 1,
       departureAirportId: 2,
       arrivalAirportId: 1,
       departureDate: timestamp,
