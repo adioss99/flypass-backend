@@ -11,6 +11,7 @@
   },
   "ignorePatterns": ["**/migrations", "**/models", "**/seeders"],
   "rules": {
-    "linebreak-style": 0
+    "linebreak-style": 0,
+    "semi" : "off"
   }
 }
