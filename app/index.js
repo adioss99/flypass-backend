@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const { FlightController } = require('./controllers');
+const { authController } = require('./controllers')
 
 const PORT = 3000;
 const app = express();
@@ -16,6 +17,19 @@ app.get('/', (req, res) => {
     message: 'go free',
   });
 });
+app.get(
+  '/v1/whoami',
+  authController.authorize,
+  authController.whoAmI,
+);
+
+app.get('/v1/logout', authController.logout);
+app.post('/v1/login', authController.login);
+app.post('/v1/register', authController.register);
+
+app.use(authController.onLost);
+app.use(authController.onError);
+
 app.get('/v1/flights', FlightController.handleListFlights);
 app.post('/v1/flight', FlightController.handleCreateFlight);
 app.listen(PORT, () => {

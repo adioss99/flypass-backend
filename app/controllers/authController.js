@@ -39,13 +39,13 @@ module.exports = {
   async register(req, res) {
     const { email } = req.body;
     const confrimPassowrd = req.body;
+    const confirmPassword = await validationResult(req)
     const encryptedPassword = await encryptPassword(req.body.password);
-    const user = await User.create({ email, encryptedPassword, confrimPassowrd });
+    const user = await User.create({ email, encryptedPassword, confirmPassword});
     res.status(201).json({
       id: user.id,
-      name: user.name,
       email: user.email,
-      confrimPassowrd: user.confrimPassowrd,
+      confirmPassword: user.confrimPassowrd,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
