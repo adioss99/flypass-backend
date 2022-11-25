@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
   });
 });
 app.get('/v1/flights', FlightController.handleListFlights);
+app.get('/v1/flight', FlightController.handleGetFlight);
 app.post('/v1/flight', FlightController.handleCreateFlight);
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
