@@ -9,6 +9,24 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      airlineId:{
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airlines'
+          },
+          key: 'id'
+        }
+      },
+      airplaneId:{
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airplanes'
+          },
+          key: 'id'
+        }
+      },
       departureAirportId: {
         type: Sequelize.INTEGER,
         references:{
