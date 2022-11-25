@@ -1,11 +1,14 @@
 /* eslint-disable import/no-unresolved */
 const express = require('express');
+const bodyParser = require('body-parser');
 
-const morgan = require('morgan');
+const { FlightController } = require('./controllers');
 
-const app = express();
 const PORT = 3000;
-const router = require('./routes/router');
+const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -13,18 +16,8 @@ app.get('/', (req, res) => {
     message: 'go free',
   });
 });
-
-/** Install request logger */
-app.use(morgan('dev'));
-
-/** Install JSON request parser */
-app.use(express.json());
-
-/** Install Router */
-app.use(router);
-
-module.exports = app;
-
+app.get('/v1/flights', FlightController.handleListFlights);
+app.post('/v1/flight', FlightController.handleCreateFlight);
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });

@@ -12,12 +12,12 @@ module.exports = {
       'Roles',
       [
         {
-          role_name: 'admin',
+          name: 'admin',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          role_name: 'member',
+          name: 'member',
           createdAt: new Date(),
           updatedAt: new Date(),
         },

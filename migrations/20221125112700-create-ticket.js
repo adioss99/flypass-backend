@@ -2,27 +2,33 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Airports', {
+    await queryInterface.createTable('Tickets', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
-      },
-      iata: {
-        type: Sequelize.STRING
-      },
-      cityId: {
+      flightId: {
         type: Sequelize.INTEGER,
         references:{
           model:{
-            tableName: 'Countries'
+            tableName:'Flights'
           },
-          key : 'id'
+          key: 'id'
         }
+      },
+      ticketClassId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'TicketClasses'
+          },
+          key: 'id'
+        }
+      },
+      price: {
+        type: Sequelize.DOUBLE
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +41,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Airports');
+    await queryInterface.dropTable('Tickets');
   }
 };
