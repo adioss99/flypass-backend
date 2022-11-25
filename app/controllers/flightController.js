@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const { Flight } = require('../../models');
+const { Flight } = require("../../models");
 
 const handleGetFlight = async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const handleListFlights = async (req, res) => {
       offset: 0,
       limit: 10,
     });
-    res.stats(200).json(flights);
+    res.status(200).json(flights);
   } catch (err) {
     res.status(404).json(err);
   }
@@ -31,30 +31,41 @@ const handleListFlights = async (req, res) => {
 const handleCreateFlight = async (req, res) => {
   try {
     const {
+      airlineId,
+      airplaneId,
       departureAirportId,
-      arrivalAirpotId,
+      arrivalAirportId,
       departureDate,
       arrivalDate,
       duration,
       flightTypeId,
     } = req.body;
     const flight = await Flight.create({
+      airlineId,
+      airplaneId,
       departureAirportId,
-      arrivalAirpotId,
+      arrivalAirportId,
       departureDate,
       arrivalDate,
       duration,
       flightTypeId,
     });
     res.status(200).json(flight);
-  } catch (error) {
-    res.status().json();
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 };
 
 const handleUpdateFlight = async (req, res) => {
   try {
     const {
+      airlineId,
+      airplaneId,
       departureAirportId,
       arrivalAirpotId,
       departureDate,
@@ -65,6 +76,8 @@ const handleUpdateFlight = async (req, res) => {
 
     const flight = await Flight.findByPk(req.params.id);
     await flight.update({
+      airlineId,
+      airplaneId,
       departureAirportId,
       arrivalAirpotId,
       departureDate,
@@ -73,11 +86,24 @@ const handleUpdateFlight = async (req, res) => {
       flightTypeId,
     });
   } catch (err) {
-    res.status(404).json(err);
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 };
 
 const handleDeleteFlight = async (req, res) => {
   const flight = Flight.destroy({ where: { id: req.params.id } });
-  res.status(204).end()
+  res.status(204).end();
+};
+
+module.exports = {
+  handleListFlights,
+  handleGetFlight,
+  handleCreateFlight,
+  handleUpdateFlight,
+  handleDeleteFlight,
 };
