@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const validationResult = require('express-validator');
 const { User } = require('../../models');
 
 const SALT = 10;
@@ -38,21 +37,20 @@ function createToken(payload) {
 module.exports = {
   async register(req, res) {
     const { email } = req.body;
-    const confrimPassowrd = req.body;
-    const confirmPassword = await validationResult(req)
+    const { name } = req.body;
+    const confirmPassword = await encryptPassword(req.body.password)
     const encryptedPassword = await encryptPassword(req.body.password);
-    const user = await User.create({ email, encryptedPassword, confirmPassword});
+    const user = await User.create({
+      email, name, encryptedPassword, confirmPassword,
+    });
     res.status(201).json({
       id: user.id,
+      name: user.name,
       email: user.email,
       confirmPassword: user.confrimPassowrd,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
-    const errors = validationResult(req);
-    if (!errors.isEmpty(confrimPassowrd)) {
-      return res.status(400).json({ errors: errors.array() });
-    }
   },
 
   async login(req, res) {
@@ -79,6 +77,7 @@ module.exports = {
     }
     const token = createToken({
       id: user.id,
+      name: user.name,
       email: user.email,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -86,6 +85,7 @@ module.exports = {
 
     res.status(201).json({
       id: user.id,
+      user: user.name,
       email: user.email,
       token,
       createdAt: user.createdAt,
@@ -99,7 +99,7 @@ module.exports = {
 
   async logout(req, res) {
     req.logout();
-    res.status(200).json(req.user);
+    res.status(201).json(req.user);
   },
 
   async authorize(req, res, next) {
