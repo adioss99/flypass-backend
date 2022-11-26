@@ -38,15 +38,21 @@ module.exports = {
   async register(req, res) {
     const { email } = req.body;
     const { name } = req.body;
+    const { phone } = req.body;
+    const { image } = req.body;
+    const { roleid } = req.body;
     const confirmPassword = await encryptPassword(req.body.password)
     const encryptedPassword = await encryptPassword(req.body.password);
     const user = await User.create({
-      email, name, encryptedPassword, confirmPassword,
+      email, name, phone, image, roleid, encryptedPassword, confirmPassword,
     });
     res.status(201).json({
       id: user.id,
       name: user.name,
       email: user.email,
+      phone: user.phone,
+      image: user.image,
+      roleid: user.roleid,
       confirmPassword: user.confrimPassowrd,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -85,7 +91,7 @@ module.exports = {
 
     res.status(201).json({
       id: user.id,
-      user: user.name,
+      name: user.name,
       email: user.email,
       token,
       createdAt: user.createdAt,
