@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'FlightType',
-    timestamps: false,
   });
   return FlightType;
 };

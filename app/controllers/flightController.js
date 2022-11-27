@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 const { Op } = require('sequelize');
 const moment = require('moment')
@@ -7,6 +6,20 @@ const {
 } = require('../../models');
 
 const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
+
+const getDuration = (start, end) => {
+  const x = moment(start, 'hh:mm:ss');
+  const y = moment(end, 'hh:mm:ss');
+  const dif = y.diff(x);
+  const dur = moment.utc(dif).format('HH:mm:ssss');
+  return dur;
+};
+
+const isSameCountry = async (departure, arrival) => {
+  const departureAirportCountry = await Airport.findByPk(departure);
+  const arrivalAirportCountry = await Airport.findByPk(arrival);
+  return departureAirportCountry.country === arrivalAirportCountry.country ? 1 : 0;
+};
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
@@ -176,20 +189,6 @@ const handleDeleteFlight = async (req, res) => {
   const flight = await Flight.destroy({ where: { id: req.params.id } });
   res.status(204).end();
 };
-
-const getDuration = (start, end) => {
-  const x = moment(start, 'hh:mm:ss')
-  const y = moment(end, 'hh:mm:ss')
-  const dif = y.diff(x)
-  const dur = moment.utc(dif).format('HH:mm:ssss')
-  return dur
-}
-
-const isSameCountry = async (departure, arrival) => {
-  const departureAirportCountry = await Airport.findByPk(departure)
-  const arrivalAirportCountry = await Airport.findByPk(arrival)
-  return departureAirportCountry.country === arrivalAirportCountry.country ? 1 : 0
-}
 
 module.exports = {
   handleListFlights,

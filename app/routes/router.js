@@ -26,9 +26,9 @@ router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController
 router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
 router.get('/v1/flights', flightController.handleListFlights);
 router.get('/v1/flights/:id', flightController.handleGetFlight);
-router.post('/v1/flights', flightController.handleCreateFlight);
-router.put('/v1/flights/:id', flightController.handleUpdateFlight);
-router.delete('/v1/flights/:id', flightController.handleDeleteFlight);
+router.post('/v1/flights', authorize, isAdmin, flightController.handleCreateFlight);
+router.put('/v1/flights/:id', authorize, isAdmin, flightController.handleUpdateFlight);
+router.delete('/v1/flights/:id', authorize, isAdmin, flightController.handleDeleteFlight);
 
 // auth
 router.post('/v1/login', authController.login);
@@ -48,9 +48,9 @@ router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'
 // airplane
 router.get('/v1/airplanes', airplaneController.getAirplanes);
 router.get('/v1/airplanes/:id', airplaneController.getAirplane);
-router.post('/v1/airplanes', airplaneController.createAirplane);
-router.put('/v1/airplanes/:id', airplaneController.updateAirplane);
-router.delete('/v1/airplanes/:id', airplaneController.deleteAirplane);
+router.post('/v1/airplanes', authorize, isAdmin, airplaneController.createAirplane);
+router.put('/v1/airplanes/:id', authorize, isAdmin, airplaneController.updateAirplane);
+router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.deleteAirplane);
 
 // airport
 router.get('/v1/airport', airportController.getAirport);

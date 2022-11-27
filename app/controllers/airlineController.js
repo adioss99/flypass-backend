@@ -58,7 +58,7 @@ const createAirline = async (req, res) => {
     const iata = req.body.iata.toUpperCase();
     const check = await checkIata(req, res, iata);
     if (check[0]) {
-      res.status(304).json({ message: 'iata existed' });
+      res.status(406).json({ message: 'iata existed' });
       return
     }
     const fileBase64 = req.file.buffer.toString('base64');
@@ -105,10 +105,12 @@ const updateAirline = async (req, res) => {
   try {
     const { name } = req.body;
     const iata = req.body.iata.toUpperCase();
-
     const data = await getData(req.params.id);
-    if (data && data.iata !== iata) {
+    const check = await checkIata(req, res, iata);
+
+    if (check[0] && check[1].id !== parseInt(req.params.id, 10)) {
       res.status(406).json({ message: 'iata existed' });
+      return;
     }
 
     let img = data.image;
