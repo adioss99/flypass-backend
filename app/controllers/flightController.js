@@ -1,13 +1,8 @@
-/* eslint-disable no-unused-vars */
-const { Flight } = require("../../models");
+const { Flight } = require('../../models');
 
 const handleGetFlight = async (req, res) => {
   try {
-    const flight = await Flight.findByPk({
-      where: {
-        id: req.params.id,
-      },
-    });
+    const flight = await Flight.findByPk(req.params.id);
     res.status(200).json(flight);
   } catch (err) {
     res.status(404).json(err);
@@ -85,6 +80,7 @@ const handleUpdateFlight = async (req, res) => {
       duration,
       flightTypeId,
     });
+    res.status(200).json({ message: 'flight updated successfully', flight });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -96,8 +92,20 @@ const handleUpdateFlight = async (req, res) => {
 };
 
 const handleDeleteFlight = async (req, res) => {
-  const flight = Flight.destroy({ where: { id: req.params.id } });
-  res.status(204).end();
+  try {
+    const flight = await Flight.destroy({ where: { id: req.params.id } });
+    if (!flight) {
+      res.status(401).json({ message: 'data not found' })
+    }
+    res.status(204).json({ message: 'flight deleted successfully' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
 };
 
 module.exports = {

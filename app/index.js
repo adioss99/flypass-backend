@@ -1,8 +1,7 @@
-/* eslint-disable import/no-unresolved */
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { FlightController } = require('./controllers');
+const routes = require('./routes/router');
 
 const PORT = 3000;
 const app = express();
@@ -10,14 +9,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    status: 'ready to fly',
-    message: 'go free',
-  });
-});
-app.get('/v1/flights', FlightController.handleListFlights);
-app.post('/v1/flight', FlightController.handleCreateFlight);
+app.use(routes);
+
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });

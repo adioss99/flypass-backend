@@ -1,19 +1,40 @@
 const express = require('express');
-const controllers = require('../controllers');
 
-const Router = express.Router();
+const {
+  getStarted,
+  userController,
+  FlightController,
+  authController,
+} = require('../controllers');
 
-Router.get(
-  '/v1/whoami',
-  controllers.authController.authorize,
-  controllers.authController.whoAmI,
-);
+const { authorize, isAdmin } = require('../middleware/authorization');
+const emailExist = require('../middleware/emailCheck');
+const uploadOnMemory = require('../middleware/uploadOnMemory');
 
-Router.get('/v1/logout', controllers.authController.logout);
-Router.post('/v1/login', controllers.authController.login);
-Router.post('/v1/register', controllers.authController.register);
+const router = express.Router();
 
-Router.use(controllers.authController.onLost);
-Router.use(controllers.authController.onError);
+router.get('/', getStarted);
 
-module.exports = Router;
+// profile
+router.get('/v1/user', authorize, userController.getProfile);
+router.put('/v1/user', authorize, uploadOnMemory.single('image'), emailExist, userController.updateProfiles);
+
+// flight
+router.get('/v1/flights', FlightController.handleListFlights);
+router.get('/v1/flight/:id', FlightController.handleGetFlight);
+router.post('/v1/flight', authorize, isAdmin, FlightController.handleCreateFlight);
+router.delete('/v1/flight/:id', authorize, isAdmin, FlightController.handleDeleteFlight);
+router.put('/v1/flight/:id', authorize, isAdmin, FlightController.handleUpdateFlight);
+
+// auth
+router.post('/v1/login', authController.login);
+router.post('/v1/register', emailExist, authController.register);
+router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
+router.get('/v1/whoami', authorize, authController.whoAmI);
+router.get('/v1/refresh', authController.refreshToken);
+router.get('/v1/logout', authController.logout);
+
+router.use(authController.onLost);
+router.use(authController.onError);
+
+module.exports = router;
