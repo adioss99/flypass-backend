@@ -1,5 +1,7 @@
-const FlightController = require('./flightController');
+const flightController = require('./flightController');
+const ticketController = require('./ticketController');
 
 module.exports = {
-  FlightController,
+  flightController,
+  ticketController,
 };

@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasMany(models.Flight,{
-        foreignKey : 'departureAirportId'
+        foreignKey : 'departureAirportId',
       })
       this.hasMany(models.Flight,{
-        foreignKey : 'arrivalAirportId'
+        foreignKey : 'arrivalAirportId',
       })
     }
   }

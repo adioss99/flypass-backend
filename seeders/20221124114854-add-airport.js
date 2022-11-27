@@ -8,12 +8,16 @@ module.exports = {
      {
      iata: 'CGK',
      name : 'Soekarno-Hatta International Airport',
+     city : 'Jakarta',
+     country: 'Indonesia',
      createdAt : timestamp,
      updatedAt : timestamp
     },
     {
       iata: 'YIA',
       name : 'Yogyakarta International Airport',
+      city : 'Yogyakarta',
+      country: 'Indonesia',
       createdAt : timestamp,
       updatedAt : timestamp
     }

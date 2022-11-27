@@ -9,22 +9,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Airport, {
-        foreignKey: "departureAirportId",
+        as: 'departureAirport'
       });
       this.belongsTo(models.Airport, {
-        foreignKey: "arrivalAirportId",
+        foreignKey:'arrivalAirportId',
+        as: 'arrivalAirport'
       });
       this.belongsTo(models.FlightType, {
         foreignKey: "flightTypeId",
       });
-      this.belongsTo(models.Flight, {
+      this.belongsTo(models.Airline, {
         foreignKey: "airlineId",
       });
         this.belongsTo(models.Flight, {
           foreignKey: "airplaneId",
         });
       this.hasMany(models.Ticket, {
-        foreignKey: "ticketId",
+        foreignKey: "id",
       });
     }
   }
