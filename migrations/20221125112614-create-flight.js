@@ -9,56 +9,53 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      departure: {
+      airlineId:{
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airlines'
+          },
+          key: 'id'
+        }
+      },
+      airplaneId:{
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airplanes'
+          },
+          key: 'id'
+        }
+      },
+      departureAirportId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airports'
+          },
+          key: 'id'
+        }
+      },
+      arrivalAirportId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'Airports'
+          },
+          key: 'id'
+        }
+      },
+      departureDate: {
         type: Sequelize.DATE
       },
-      arrival: {
+      arrivalDate: {
         type: Sequelize.DATE
       },
       duration: {
         type: Sequelize.TIME
       },
-      price: {
-        type: Sequelize.DOUBLE
-      },
-      capacity: {
+      flightTypeId: {
         type: Sequelize.INTEGER
-      },
-      departureAirportId: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : {
-            tableName : 'Airports'
-          },
-          key : 'id'
-        }
-      },
-      arrivalAirportId: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : {
-            tableName : 'Airports'
-          },
-          key : 'id'
-        }
-      },
-      airlinesId: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : {
-            tableName : 'Airlines'
-          },
-          key : 'id'
-        }
-      },
-      airplanesId: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : {
-            tableName : 'Airplanes'
-          },
-          key : 'id'
-        }
       },
       createdAt: {
         allowNull: false,

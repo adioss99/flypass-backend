@@ -1,14 +1,15 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
-const app = express();
+const routes = require('./routes/router');
+
 const PORT = 3000;
+const app = express();
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    status: 'ready to fly',
-    message: 'go free',
-  });
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(routes);
 
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);

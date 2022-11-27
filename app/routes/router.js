@@ -1,0 +1,40 @@
+const express = require('express');
+
+const {
+  getStarted,
+  userController,
+  FlightController,
+  authController,
+} = require('../controllers');
+
+const { authorize, isAdmin } = require('../middleware/authorization');
+const emailExist = require('../middleware/emailCheck');
+const uploadOnMemory = require('../middleware/uploadOnMemory');
+
+const router = express.Router();
+
+router.get('/', getStarted);
+
+// profile
+router.get('/v1/user', authorize, userController.getProfile);
+router.put('/v1/user', authorize, uploadOnMemory.single('image'), emailExist, userController.updateProfiles);
+
+// flight
+router.get('/v1/flights', FlightController.handleListFlights);
+router.get('/v1/flight/:id', FlightController.handleGetFlight);
+router.post('/v1/flight', authorize, isAdmin, FlightController.handleCreateFlight);
+router.delete('/v1/flight/:id', authorize, isAdmin, FlightController.handleDeleteFlight);
+router.put('/v1/flight/:id', authorize, isAdmin, FlightController.handleUpdateFlight);
+
+// auth
+router.post('/v1/login', authController.login);
+router.post('/v1/register', emailExist, authController.register);
+router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
+router.get('/v1/whoami', authorize, authController.whoAmI);
+router.get('/v1/refresh', authController.refreshToken);
+router.get('/v1/logout', authController.logout);
+
+router.use(authController.onLost);
+router.use(authController.onError);
+
+module.exports = router;
