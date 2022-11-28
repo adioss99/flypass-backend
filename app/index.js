@@ -4,7 +4,6 @@ const multer = require('multer')
 
 const { flightController } = require('./controllers');
 
-
 const PORT = 3000;
 const app = express();
 
@@ -23,7 +22,6 @@ app.get('/v1/flights', flightController.handleListFlights);
 app.get('/v1/flights/:id', flightController.handleGetFlight);
 app.post('/v1/flights', flightController.handleCreateFlight);
 app.put('/v1/flights/:id', flightController.handleUpdateFlight);
-
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });
