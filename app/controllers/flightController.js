@@ -135,7 +135,6 @@ const handleUpdateFlight = async (req, res) => {
     const dur = getDuration(departureTime, arrivalTime)
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flight = await Flight.findByPk(req.params.id);
-    console.log(req.params.id)
     await flight.update({
       flightCode,
       airlineId,
@@ -151,7 +150,7 @@ const handleUpdateFlight = async (req, res) => {
       duration: dur,
       flightTypeId: flightType,
     });
-    res.status(200).json({ 
+    res.status(200).json({
       flight,
       status: 'Ok',
       message: `Flight with Id ${flight.id} updated`,
