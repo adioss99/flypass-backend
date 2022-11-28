@@ -4,13 +4,18 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const timestamp = new Date()
-    await queryInterface.bulkInsert('Tickets',[{
-      flightId: 1,
-      ticketClassId: 1,
-      price: 500000,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    }]);
+    await queryInterface.bulkInsert('FlightClasses',[
+     {
+     name: 'Economy',
+     createdAt : timestamp,
+     updatedAt : timestamp
+    },
+    {
+     name: 'Business',
+     createdAt : timestamp,
+     updatedAt : timestamp
+    }
+   ])
   },
 
   async down (queryInterface, Sequelize) {

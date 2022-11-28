@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer')
 
-const { flightController, ticketController } = require('./controllers');
+const { flightController } = require('./controllers');
+
 
 const PORT = 3000;
 const app = express();
@@ -17,12 +18,12 @@ app.get('/', (req, res) => {
     message: 'go free',
   });
 });
+app.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight)
 app.get('/v1/flights', flightController.handleListFlights);
-app.get('/v1/flight', flightController.handleGetFlight);
-app.post('/v1/flight', flightController.handleCreateFlight);
+app.get('/v1/flights/:id', flightController.handleGetFlight);
+app.post('/v1/flights', flightController.handleCreateFlight);
+app.put('/v1/flights/:id', flightController.handleUpdateFlight);
 
-app.get('/v1/tickets', ticketController.handleListTickets)
-app.post('/v1/ticket', ticketController.handleCreateTicket)
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });

@@ -6,31 +6,15 @@ const {
   Flight, Airport, Airline, Airplane,
 } = require('../../models');
 
+const flightAttr = ['id', 'flightCode', 'departureDate', 'arrivalDate', 'duration', 'price'];
+
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
   // const { page = 1, limit = 10 } = req.query;
   try {
-    const flightAttr = ['id', 'departureDate', 'arrivalDate', 'duration'];
-    const airlineAttr = ['id', 'name', 'image'];
-    const airplaneAttr = ['id', 'name'];
-    const airportAttr = ['id', 'iata', 'name', 'city', 'country'];
-    const flights = await Flight.findAndCountAll({
+    const flights = await Flight.findAll({
       attributes: flightAttr,
-      include: [
-        {
-          model: Airline,
-        },
-        {
-          model: Airport,
-          as: 'departureAirport',
-          attributes: airportAttr,
-        },
-        {
-          model: Airport,
-          as: 'arrivalAirport',
-          attributes: airportAttr,
-        },
-      ],
+      include: { all: true },
       offset: 0,
       limit: 10,
     });
@@ -41,10 +25,9 @@ const handleListFlights = async (req, res) => {
 };
 const handleGetFlight = async (req, res) => {
   try {
-    const flight = await Flight.findByPk({
-      where: {
-        id: req.params.id,
-      },
+    const flight = await Flight.findByPk(req.params.id, {
+      attributes: flightAttr,
+      include: { all: true },
     });
     res.status(200).json(flight);
   } catch (err) {
@@ -52,30 +35,78 @@ const handleGetFlight = async (req, res) => {
   }
 };
 
+const handleSearchFlight = async (req, res) => {
+  const { depDate, depAirport, arrAirport } = req.query
+  try {
+    const flight = await Flight.findAll({
+      attributes: flightAttr,
+      where: {
+        departureDate: { [Op.eq]: depDate },
+      },
+      include: [
+        {
+          model: Airline,
+          attributes: ['name'],
+        },
+        {
+          model: Airplane,
+          attributes: ['icao', 'model'],
+        },
+        {
+          model: Airport,
+          as: 'departureAirport',
+          where: { iata: depAirport },
+        },
+        {
+          model: Airport,
+          as: 'arrivalAirport',
+          where: { iata: arrAirport },
+        },
+      ],
+    })
+    res.status(200).json({ flight })
+  } catch (err) {
+    res.status(404).json(err)
+  }
+}
+
 const handleCreateFlight = async (req, res) => {
   try {
     const {
+      flightCode,
       airlineId,
       airplaneId,
       departureAirportId,
       arrivalAirportId,
       departureDate,
+      departureTime,
       arrivalDate,
+      arrivalTime,
+      price,
+      flightClassId,
     } = req.body;
-    const dur = getDuration(departureDate, arrivalDate)
+    const dur = getDuration(departureTime, arrivalTime)
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
-    console.log(flightType)
     const flight = await Flight.create({
+      flightCode,
       airlineId,
       airplaneId,
       departureAirportId,
       arrivalAirportId,
       departureDate,
+      departureTime,
       arrivalDate,
+      arrivalTime,
+      price,
+      flightClassId,
       duration: dur,
       flightTypeId: flightType,
     });
-    res.status(200).json(flight);
+    res.status(200).json({
+      flight,
+      status: 'Ok',
+      message: 'Flight created',
+    });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -89,27 +120,42 @@ const handleCreateFlight = async (req, res) => {
 const handleUpdateFlight = async (req, res) => {
   try {
     const {
+      flightCode,
       airlineId,
       airplaneId,
       departureAirportId,
-      arrivalAirpotId,
+      arrivalAirportId,
       departureDate,
+      departureTime,
       arrivalDate,
-      duration,
-      flightTypeId,
+      arrivalTime,
+      price,
+      flightClassId,
     } = req.body;
-
+    const dur = getDuration(departureTime, arrivalTime)
+    const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flight = await Flight.findByPk(req.params.id);
+    console.log(req.params.id)
     await flight.update({
+      flightCode,
       airlineId,
       airplaneId,
       departureAirportId,
-      arrivalAirpotId,
+      arrivalAirportId,
       departureDate,
+      departureTime,
       arrivalDate,
-      duration,
-      flightTypeId,
+      arrivalTime,
+      price,
+      flightClassId,
+      duration: dur,
+      flightTypeId: flightType,
     });
+    res.status(200).json({ 
+      flight,
+      status: 'Ok',
+      message: `Flight with Id ${flight.id} updated`,
+    })
   } catch (err) {
     res.status(422).json({
       error: {
@@ -121,15 +167,15 @@ const handleUpdateFlight = async (req, res) => {
 };
 
 const handleDeleteFlight = async (req, res) => {
-  const flight = Flight.destroy({ where: { id: req.params.id } });
+  const flight = await Flight.destroy({ where: { id: req.params.id } });
   res.status(204).end();
 };
 
 const getDuration = (start, end) => {
-  const x = moment(start)
-  const y = moment(end)
+  const x = moment(start, 'hh:mm:ss')
+  const y = moment(end, 'hh:mm:ss')
   const dif = y.diff(x)
-  const dur = moment.utc(dif).format('HH:mm:ss')
+  const dur = moment.utc(dif).format('HH:mm:ssss')
   return dur
 }
 
@@ -142,6 +188,7 @@ const isSameCountry = async (departure, arrival) => {
 module.exports = {
   handleListFlights,
   handleGetFlight,
+  handleSearchFlight,
   handleCreateFlight,
   handleUpdateFlight,
   handleDeleteFlight,
