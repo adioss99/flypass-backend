@@ -5,6 +5,7 @@ const {
   userController,
   FlightController,
   authController,
+  airlineController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -17,7 +18,7 @@ router.get('/', getStarted);
 
 // profile
 router.get('/v1/user', authorize, userController.getProfile);
-router.put('/v1/user', authorize, uploadOnMemory.single('image'), emailExist, userController.updateProfiles);
+router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 
 // flight
 router.get('/v1/flights', FlightController.handleListFlights);
@@ -33,6 +34,13 @@ router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController
 router.get('/v1/whoami', authorize, authController.whoAmI);
 router.get('/v1/refresh', authController.refreshToken);
 router.get('/v1/logout', authController.logout);
+
+// airline
+router.get('/v1/airlines', authorize, isAdmin, airlineController.getAirlines);
+router.get('/v1/airlines/:id', authorize, isAdmin, airlineController.getAirline);
+router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
+router.delete('/v1/airlines/:id', authorize, isAdmin, airlineController.deleteAirline);
+router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 
 router.use(authController.onLost);
 router.use(authController.onError);
