@@ -24,6 +24,12 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
+      imageId: {
+        type: Sequelize.STRING
+      },
+      refreshToken: {
+        type: Sequelize.TEXT
+      },
       roleId: {
         type: Sequelize.INTEGER,
         references:{
