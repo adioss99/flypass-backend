@@ -1,11 +1,7 @@
 const express = require('express');
 
 const {
-  getStarted,
-  userController,
-  FlightController,
-  authController,
-  airlineController,
+  getStarted, userController, flightController, authController, airlineController
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -21,11 +17,16 @@ router.get('/v1/user', authorize, userController.getProfile);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 
 // flight
-router.get('/v1/flights', FlightController.handleListFlights);
-router.get('/v1/flight/:id', FlightController.handleGetFlight);
-router.post('/v1/flight', authorize, isAdmin, FlightController.handleCreateFlight);
-router.delete('/v1/flight/:id', authorize, isAdmin, FlightController.handleDeleteFlight);
-router.put('/v1/flight/:id', authorize, isAdmin, FlightController.handleUpdateFlight);
+// router.get('/v1/flights', FlightController.handleListFlights);
+// router.get('/v1/flight/:id', FlightController.handleGetFlight);
+// router.post('/v1/flight', authorize, isAdmin, FlightController.handleCreateFlight);
+// router.delete('/v1/flight/:id', authorize, isAdmin, FlightController.handleDeleteFlight);
+// router.put('/v1/flight/:id', authorize, isAdmin, FlightController.handleUpdateFlight);
+router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
+router.get('/v1/flights', flightController.handleListFlights);
+router.get('/v1/flights/:id', flightController.handleGetFlight);
+router.post('/v1/flights', flightController.handleCreateFlight);
+router.put('/v1/flights/:id', flightController.handleUpdateFlight);
 
 // auth
 router.post('/v1/login', authController.login);

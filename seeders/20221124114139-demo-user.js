@@ -1,9 +1,6 @@
 'use strict';
 const bcrypt = require("bcryptjs");
 
-
-
-
 module.exports = {
   async up (queryInterface, Sequelize) {
     const password = "123456";
