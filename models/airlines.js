@@ -15,8 +15,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Airline.init(
     {
+      iata: DataTypes.STRING,
       name: DataTypes.STRING,
       image: DataTypes.STRING,
+      imageId: DataTypes.STRING,
     },
     {
       sequelize,

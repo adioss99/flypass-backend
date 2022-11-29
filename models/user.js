@@ -15,16 +15,21 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
-  User.init({
-    name: DataTypes.STRING,
-    encryptedPassword: DataTypes.STRING,
-    email: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    image: DataTypes.STRING,
-    roleId: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
+  User.init(
+    {
+      name: DataTypes.STRING,
+      encryptedPassword: DataTypes.STRING,
+      email: DataTypes.STRING,
+      phone: DataTypes.STRING,
+      image: DataTypes.STRING,
+      imageId: DataTypes.STRING,
+      refreshToken: DataTypes.TEXT,
+      roleId: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: 'User',
+    }
+  );
   return User;
 };
