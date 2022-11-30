@@ -2,7 +2,7 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const {
-  Flight, Airport, Airline, Airplane,
+  Flight, Airport, Airline, Airplane, FlightType, FlightClass,
 } = require('../../models');
 
 const getDuration = (start, end) => {
@@ -20,6 +20,28 @@ const isSameCountry = async (departure, arrival) => {
 };
 
 const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
+const inc = [
+  {
+    model: Airline,
+  },
+  {
+    model: Airplane,
+  },
+  {
+    model: FlightClass,
+  },
+  {
+    model: FlightType,
+  },
+  {
+    model: Airport,
+    as: 'departureAirport',
+  },
+  {
+    model: Airport,
+    as: 'arrivalAirport',
+  },
+];
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
@@ -30,7 +52,7 @@ const handleListFlights = async (req, res) => {
         isAvailable: { [Op.is]: true },
       },
       attributes: flightAttr,
-      include: { all: true },
+      include: inc,
       offset: 0,
       limit: 10,
     });
@@ -44,7 +66,7 @@ const handleGetFlight = async (req, res) => {
   try {
     const flight = await Flight.findByPk(req.params.id, {
       attributes: flightAttr,
-      include: { all: true },
+      include: inc,
     });
     res.status(200).json(flight);
   } catch (err) {
@@ -63,7 +85,16 @@ const handleSearchFlight = async (req, res) => {
       },
       include: [
         {
-          all: true,
+          model: Airline,
+        },
+        {
+          model: Airplane,
+        },
+        {
+          model: FlightClass,
+        },
+        {
+          model: FlightType,
         },
         {
           model: Airport,
@@ -198,4 +229,5 @@ module.exports = {
   handleCreateFlight,
   handleUpdateFlight,
   handleDeleteFlight,
+  inc,
 };

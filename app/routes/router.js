@@ -8,6 +8,7 @@ const {
   airlineController,
   airplaneController,
   airportController,
+  whistlistController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -54,6 +55,11 @@ router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.delete
 
 // airport
 router.get('/v1/airport', airportController.getAirport);
+
+// whistlist
+router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
+router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
+router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
 
 router.use(authController.onLost);
 router.use(authController.onError);
