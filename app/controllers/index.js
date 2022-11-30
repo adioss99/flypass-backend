@@ -1,6 +1,7 @@
-const FlightController = require('./flightController');
+const flightController = require('./flightController');
 const authController = require('./authController');
 const userController = require('./userController');
+const airlineController = require('./airlineController');
 
 const getStarted = (req, res) => {
   res.status(200).json({
@@ -11,7 +12,8 @@ const getStarted = (req, res) => {
 
 module.exports = {
   getStarted,
-  FlightController,
+  flightController,
   authController,
   userController,
+  airlineController,
 };

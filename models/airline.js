@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Airline.init(
     {
+      iata: DataTypes.STRING,
       name: DataTypes.STRING,
       image: DataTypes.STRING,
       imageId: DataTypes.STRING,
@@ -22,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Airline",
+      timestamps: false,
     }
   );
   return Airline;

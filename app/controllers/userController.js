@@ -19,8 +19,15 @@ const updateProfiles = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
-      name, email, phone,
+      name, phone,
     } = req.body;
+
+    const email = req.body.email.toLowerCase();
+    const getEmail = await User.findOne({ where: { email } });
+    if (getEmail && email !== req.user.email) {
+      res.status(401).json({ message: 'email is already used' });
+      return;
+    }
 
     const profile = await User.findByPk(userId, { attributes: ['image', 'imageId'] });
     let img = profile.image;

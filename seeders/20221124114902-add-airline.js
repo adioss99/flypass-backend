@@ -4,12 +4,15 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const timestamp = new Date()
-    await queryInterface.bulkInsert('Airlines',[{
-      name: 'Garuda Indonesia',
-      image : 'someimage.png',
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    }]);
+    await queryInterface.bulkInsert('Airlines', [
+      {
+        iata: 'GA',
+        name: 'Garuda Indonesia',
+        image: 'https://res.cloudinary.com/dixlrulen/image/upload/v1669640315/airlines/x51zrga3kcoktz3eihfo.png',
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+    ]);
   },
 
   async down (queryInterface, Sequelize) {

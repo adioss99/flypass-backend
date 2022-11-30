@@ -7,7 +7,6 @@ const routes = require('./routes/router');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(multer().none())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
