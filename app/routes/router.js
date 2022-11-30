@@ -53,12 +53,8 @@ router.put('/v1/airplanes/:id', airplaneController.updateAirplane);
 router.delete('/v1/airplanes/:id', airplaneController.deleteAirplane);
 
 // airport
-<<<<<<< HEAD
-router.get('v1/airport/', airportController.getAirport)
-=======
 router.get('/v1/airport', airportController.getAirport);
 
->>>>>>> cdf4e809a12ba3ace2be8a8117d8f55bf2a21f21
 router.use(authController.onLost);
 router.use(authController.onError);
 
