@@ -2,7 +2,12 @@ const express = require('express');
 
 const {
   // eslint-disable-next-line max-len
-  getStarted, userController, flightController, authController, airlineController, airportController,
+  getStarted,
+  userController,
+  flightController,
+  authController,
+  airlineController,
+  airportController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -45,7 +50,9 @@ router.delete('/v1/airlines/:id', authorize, isAdmin, airlineController.deleteAi
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 
 // airport
-router.get('v1/airport/')
+router.get('/v1/airport', airportController.getAirport);
+
+
 router.use(authController.onLost);
 router.use(authController.onError);
 
