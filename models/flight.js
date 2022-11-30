@@ -46,6 +46,9 @@ module.exports = (sequelize, DataTypes) => {
       duration: DataTypes.TIME,
       flightTypeId: DataTypes.INTEGER,
       flightClassId: DataTypes.INTEGER,
+      price: DataTypes.DOUBLE,
+      baggage: DataTypes.INTEGER,
+      isAvailable: DataTypes.BOOLEAN,
     },
     {
       sequelize,

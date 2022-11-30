@@ -78,6 +78,12 @@ module.exports = {
           key: "id",
         },
       },
+      baggage: {
+        type: Sequelize.INTEGER,
+      },
+      isAvailable: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

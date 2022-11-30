@@ -27,6 +27,7 @@ router.get('/v1/flights', flightController.handleListFlights);
 router.get('/v1/flights/:id', flightController.handleGetFlight);
 router.post('/v1/flights', flightController.handleCreateFlight);
 router.put('/v1/flights/:id', flightController.handleUpdateFlight);
+router.delete('/v1/flights/:id', flightController.handleDeleteFlight);
 
 // auth
 router.post('/v1/login', authController.login);

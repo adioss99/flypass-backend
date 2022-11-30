@@ -6,13 +6,16 @@ const {
   Flight, Airport, Airline, Airplane,
 } = require('../../models');
 
-const flightAttr = ['id', 'flightCode', 'departureDate', 'arrivalDate', 'duration', 'price'];
+const flightAttr = ['id', 'flightCode', 'departureDate', 'arrivalDate', 'duration', 'price', 'baggage', 'isAvailable'];
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
   // const { page = 1, limit = 10 } = req.query;
   try {
     const flights = await Flight.findAll({
+      where: {
+        isAvailable: { [Op.is]: true },
+      },
       attributes: flightAttr,
       include: { all: true },
       offset: 0,
@@ -42,6 +45,7 @@ const handleSearchFlight = async (req, res) => {
       attributes: flightAttr,
       where: {
         departureDate: { [Op.eq]: depDate },
+        isAvailable: { [Op.is]: true },
       },
       include: [
         {
@@ -84,7 +88,10 @@ const handleCreateFlight = async (req, res) => {
       arrivalTime,
       price,
       flightClassId,
+      baggage,
+      isAvailable,
     } = req.body;
+    console.log(req.body)
     const dur = getDuration(departureTime, arrivalTime)
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flight = await Flight.create({
@@ -97,10 +104,12 @@ const handleCreateFlight = async (req, res) => {
       departureTime,
       arrivalDate,
       arrivalTime,
-      price,
-      flightClassId,
       duration: dur,
       flightTypeId: flightType,
+      flightClassId,
+      price,
+      baggage,
+      isAvailable,
     });
     res.status(200).json({
       flight,
@@ -131,6 +140,8 @@ const handleUpdateFlight = async (req, res) => {
       arrivalTime,
       price,
       flightClassId,
+      baggage,
+      isAvailable,
     } = req.body;
     const dur = getDuration(departureTime, arrivalTime)
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
@@ -145,10 +156,12 @@ const handleUpdateFlight = async (req, res) => {
       departureTime,
       arrivalDate,
       arrivalTime,
-      price,
-      flightClassId,
       duration: dur,
       flightTypeId: flightType,
+      flightClassId,
+      price,
+      baggage,
+      isAvailable,
     });
     res.status(200).json({
       flight,
