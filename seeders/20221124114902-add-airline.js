@@ -8,7 +8,7 @@ module.exports = {
       {
         iata: 'GA',
         name: 'Garuda Indonesia',
-        image: 'https://res.cloudinary.com/dixlrulen/image/upload/v1669640315/airlines/x51zrga3kcoktz3eihfo.png',
+        image: 'https://res.cloudinary.com/dixlrulen/image/upload/v1669693848/airlines/u0he6bwcqwyplhmbvr6a.png',
         createdAt: timestamp,
         updatedAt: timestamp,
       },

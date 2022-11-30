@@ -2,6 +2,7 @@ const flightController = require('./flightController');
 const authController = require('./authController');
 const userController = require('./userController');
 const airlineController = require('./airlineController');
+const airplaneController = require('./airplaneController');
 const airportController = require('./airportController');
 
 const getStarted = (req, res) => {
@@ -17,5 +18,6 @@ module.exports = {
   authController,
   userController,
   airlineController,
+  airplaneController,
   airportController,
 };
