@@ -6,7 +6,7 @@ const {
   Flight, Airport, Airline, Airplane,
 } = require('../../models');
 
-const flightAttr = ['id', 'flightCode', 'departureDate','departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price'];
+const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
