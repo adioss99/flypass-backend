@@ -6,7 +6,7 @@ const {
   Flight, Airport, Airline, Airplane,
 } = require('../../models');
 
-const flightAttr = ['id', 'flightCode', 'departureDate', 'arrivalDate', 'duration', 'price', 'baggage', 'isAvailable'];
+const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
@@ -49,12 +49,7 @@ const handleSearchFlight = async (req, res) => {
       },
       include: [
         {
-          model: Airline,
-          attributes: ['name'],
-        },
-        {
-          model: Airplane,
-          attributes: ['icao', 'model'],
+          all: true,
         },
         {
           model: Airport,
@@ -91,7 +86,6 @@ const handleCreateFlight = async (req, res) => {
       baggage,
       isAvailable,
     } = req.body;
-    console.log(req.body)
     const dur = getDuration(departureTime, arrivalTime)
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flight = await Flight.create({
