@@ -9,35 +9,46 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.Airport, {
-        foreignKey: "departureAirportId",
+        as: 'departureAirport'
       });
       this.belongsTo(models.Airport, {
-        foreignKey: "arrivalAirportId",
+        foreignKey:'arrivalAirportId',
+        as: 'arrivalAirport'
       });
       this.belongsTo(models.FlightType, {
         foreignKey: "flightTypeId",
       });
-      this.belongsTo(models.Flight, {
+      this.belongsTo(models.Airline, {
         foreignKey: "airlineId",
       });
-        this.belongsTo(models.Flight, {
-          foreignKey: "airplaneId",
-        });
-      this.hasMany(models.Ticket, {
-        foreignKey: "ticketId",
+      this.belongsTo(models.Airline, {
+        foreignKey: "airlineId",
       });
+      this.belongsTo(models.Airplane, {
+        foreignKey: "airplaneId",
+      });
+      this.belongsTo(models.FlightClass,{
+        foreignKey: 'flightClassId'
+      })
     }
   }
   Flight.init(
     {
+      flightCode : DataTypes.STRING,
       airlineId : DataTypes.INTEGER,
       airplaneId : DataTypes.INTEGER,
       departureAirportId: DataTypes.INTEGER,
       arrivalAirportId: DataTypes.INTEGER,
-      departureDate: DataTypes.DATE,
-      arrivalDate: DataTypes.DATE,
+      departureDate: DataTypes.DATEONLY,
+      arrivalDate: DataTypes.DATEONLY,
+      departureTime: DataTypes.TIME,
+      arrivalTime: DataTypes.TIME,
       duration: DataTypes.TIME,
       flightTypeId: DataTypes.INTEGER,
+      flightClassId: DataTypes.INTEGER,
+      price: DataTypes.DOUBLE,
+      baggage: DataTypes.INTEGER,
+      isAvailable: DataTypes.BOOLEAN,
     },
     {
       sequelize,
