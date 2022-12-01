@@ -8,6 +8,7 @@ const {
   airlineController,
   airplaneController,
   airportController,
+  bookingController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -54,6 +55,9 @@ router.delete('/v1/airplanes/:id', airplaneController.deleteAirplane);
 
 // airport
 router.get('/v1/airport', airportController.getAirport);
+
+// test
+router.post('/v1/flights/book', bookingController.handleCreateBooking)
 
 router.use(authController.onLost);
 router.use(authController.onError);
