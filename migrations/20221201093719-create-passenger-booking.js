@@ -10,10 +10,20 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       passengerId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model: {
+            tableName: 'Passengers'
+          }
+        }
       },
       bookingId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model: {
+            tableName: 'Bookings'
+          }
+        }
       },
       createdAt: {
         allowNull: false,

@@ -16,10 +16,28 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       flight1Id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName: 'Flights'
+          }
+        }
       },
       flight2Id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName: 'Flights'
+          }
+        }
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName: 'Users'
+          }
+        }
       },
       bookingStatusId: {
         type: Sequelize.INTEGER

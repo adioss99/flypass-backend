@@ -14,6 +14,15 @@ module.exports = (sequelize, DataTypes) => {
         through: 'PassengerBooking',
         foreignKey: 'bookingId'
       })
+      this.belongsTo(models.Flight,{
+        foreignKey: 'flight1Id',
+        as: 'flight1'
+      })
+      this.belongsTo(models.Flight,{
+        foreignKey: 'flight2Id',
+        as: 'flight2'
+
+      })
     }
   }
   Booking.init({
@@ -21,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     roundtrip: DataTypes.BOOLEAN,
     flight1Id: DataTypes.INTEGER,
     flight2Id: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER,
     bookingStatusId: DataTypes.INTEGER,
     passengerQty: DataTypes.INTEGER,
     totalPrice: DataTypes.DOUBLE

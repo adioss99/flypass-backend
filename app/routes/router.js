@@ -57,7 +57,8 @@ router.delete('/v1/airplanes/:id', airplaneController.deleteAirplane);
 router.get('/v1/airport', airportController.getAirport);
 
 // test
-router.post('/v1/flights/book', bookingController.handleCreateBooking)
+router.get('/v1/bookings', bookingController.handleListBookings)
+router.post('/v1/flights/book', bookingController.handleBookFlight)
 
 router.use(authController.onLost);
 router.use(authController.onError);
