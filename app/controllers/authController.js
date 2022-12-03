@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// const validationResult = require('express-validator');
 const { User } = require('../../models');
 
 const SALT = 10;
@@ -57,10 +56,6 @@ const register = async (req, res, roles) => {
   res.status(201).json({
     message: 'register success',
   });
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty(confirmationPassword)) {
-  //   res.status(400).json({ errors: errors.array() });
-  // }
 };
 
 const registerAdmin = async (req, res) => {
@@ -190,8 +185,13 @@ const refreshToken = async (req, res) => {
         accessToken,
       });
     });
-  } catch (error) {
-    res.send(403).json({ message: 'refreshToken error' })
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 };
 
