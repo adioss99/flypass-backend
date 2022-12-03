@@ -4,7 +4,7 @@ const cloudinary = require('../utils/cloudinary');
 const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const profile = await User.findByPk(userId, { attributes: ['id', 'name', 'email', 'phone', 'image', 'roleId'] });
+    const profile = await User.findByPk(userId, { attributes: ['id', 'name', 'gender', 'birthDate', 'email', 'phone', 'image', 'roleId'] });
     res.status(200).json({
       profile,
     });
@@ -19,7 +19,7 @@ const updateProfiles = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
-      name, phone,
+      name, phone, gender, birthDate,
     } = req.body;
 
     const email = req.body.email.toLowerCase();
@@ -49,6 +49,8 @@ const updateProfiles = async (req, res) => {
         name,
         email,
         phone,
+        gender,
+        birthDate,
         image: img,
         imageId: imgId,
       },
