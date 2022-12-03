@@ -64,11 +64,11 @@ const handleListFlights = async (req, res) => {
 
 const handleGetFlight = async (req, res) => {
   try {
-    const flight = await Flight.findByPk(req.params.id, {
+    const flights = await Flight.findByPk(req.params.id, {
       attributes: flightAttr,
       include: inc,
     });
-    res.status(200).json(flight);
+    res.status(200).json(flights);
   } catch (err) {
     res.status(404).json(err);
   }
@@ -77,7 +77,7 @@ const handleGetFlight = async (req, res) => {
 const handleSearchFlight = async (req, res) => {
   const { depDate, depAirport, arrAirport } = req.query;
   try {
-    const flight = await Flight.findAll({
+    const flights = await Flight.findAll({
       attributes: flightAttr,
       where: {
         departureDate: { [Op.eq]: depDate },
@@ -108,7 +108,7 @@ const handleSearchFlight = async (req, res) => {
         },
       ],
     });
-    res.status(200).json({ flight });
+    res.status(200).json({ flights });
   } catch (err) {
     res.status(404).json(err);
   }
@@ -133,7 +133,7 @@ const handleCreateFlight = async (req, res) => {
     } = req.body;
     const dur = getDuration(departureTime, arrivalTime);
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId);
-    const flight = await Flight.create({
+    const flights = await Flight.create({
       flightCode,
       airlineId,
       airplaneId,
@@ -151,7 +151,7 @@ const handleCreateFlight = async (req, res) => {
       isAvailable,
     });
     res.status(200).json({
-      flight,
+      flights,
       status: 'Ok',
       message: 'Flight created',
     });
@@ -184,8 +184,8 @@ const handleUpdateFlight = async (req, res) => {
     } = req.body;
     const dur = getDuration(departureTime, arrivalTime);
     const flightType = await isSameCountry(departureAirportId, arrivalAirportId);
-    const flight = await Flight.findByPk(req.params.id);
-    await flight.update({
+    const flights = await Flight.findByPk(req.params.id);
+    await flights.update({
       flightCode,
       airlineId,
       airplaneId,
@@ -203,9 +203,9 @@ const handleUpdateFlight = async (req, res) => {
       isAvailable,
     });
     res.status(200).json({
-      flight,
+      flights,
       status: 'Ok',
-      message: `Flight with Id ${flight.id} updated`,
+      message: `Flight with Id ${flights.id} updated`,
     });
   } catch (err) {
     res.status(422).json({
@@ -218,8 +218,8 @@ const handleUpdateFlight = async (req, res) => {
 };
 
 const handleDeleteFlight = async (req, res) => {
-  const flight = await Flight.destroy({ where: { id: req.params.id } });
-  res.status(204).json({ message: `Flight with Id ${flight.id} updated` });
+  const flights = await Flight.destroy({ where: { id: req.params.id } });
+  res.status(204).json({ message: `Flight with Id ${flights.id} deleted` });
 };
 
 module.exports = {
