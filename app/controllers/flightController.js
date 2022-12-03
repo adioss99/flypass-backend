@@ -203,7 +203,7 @@ const handleUpdateFlight = async (req, res) => {
       isAvailable,
     });
     res.status(200).json({
-      flight,
+      flights,
       status: 'Ok',
       message: `Flight with Id ${flights.id} updated`,
     });
@@ -219,7 +219,7 @@ const handleUpdateFlight = async (req, res) => {
 
 const handleDeleteFlight = async (req, res) => {
   const flights = await Flight.destroy({ where: { id: req.params.id } });
-  res.status(204).json({ message: `Flight with Id ${flight.id} updated` });
+  res.status(204).json({ message: `Flight with Id ${flights.id} deleted` });
 };
 
 module.exports = {
