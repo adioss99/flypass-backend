@@ -29,7 +29,10 @@ module.exports = (sequelize, DataTypes) => {
       });
       this.belongsTo(models.FlightClass,{
         foreignKey: 'flightClassId'
-      })
+      });
+      this.hasMany(models.Whistlist, {
+        foreignKey: 'flightId'
+      });
     }
   }
   Flight.init(
