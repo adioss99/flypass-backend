@@ -1,6 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-plusplus */
 const jwt = require('jsonwebtoken')
+const Op = require('sequelize')
 const {
   Passenger, Booking, PassengerBooking, Flight,
 } = require('../../models');
@@ -26,8 +27,13 @@ const handleListBookings = async (req, res) => {
       ],
     })
     res.status(200).json(booking)
-  } catch (error) {
-    res.status(404).json(error)
+  } catch (err) {
+    res.status(404).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 }
 
@@ -66,6 +72,49 @@ const handleBookFlight = async (req, res) => {
   }
 }
 
+const handleSearchBookingByCode = async (req, res) => {
+  try {
+    const booking = await Booking.findAll({
+      include: { all: true },
+      where: {
+        bookingCode: req.query.bookingcode,
+      },
+    })
+    res.status(200).json({ booking })
+  } catch (err) {
+    res.status(404).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
+const handleGetUserBooking = async (req, res) => {
+  try {
+    const user = userToken(req)
+    const booking = await Booking.findAll({
+      include: { all: true },
+      where: {
+        userId: user.id,
+      },
+    })
+    res.status(200).json({ booking })
+  } catch (err) {
+    res.status(404).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+const handleDeleteBooking = async (req, res) => {
+  const booking = await Booking.destroy({ where: { id: req.params.id } });
+  res.status(204).end();
+}
+
 const createBookingCode = () => {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -98,4 +147,7 @@ const countTotalPrice = async (flight1, flight2, qty) => {
 module.exports = {
   handleListBookings,
   handleBookFlight,
+  handleGetUserBooking,
+  handleSearchBookingByCode,
+  handleDeleteBooking,
 }

@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         as: 'flight2'
 
       })
+      this.belongsTo(models.User,{
+        foreignKey: 'userId'
+      })
     }
   }
   Booking.init({

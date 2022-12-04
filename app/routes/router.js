@@ -57,8 +57,11 @@ router.delete('/v1/airplanes/:id', airplaneController.deleteAirplane);
 router.get('/v1/airport', airportController.getAirport);
 
 // test
-router.get('/v1/bookings', bookingController.handleListBookings)
-router.post('/v1/flights/book', bookingController.handleBookFlight)
+router.post('/v1/flights/books', bookingController.handleBookFlight)
+router.get('/v1/bookings/all', bookingController.handleListBookings)
+router.get('/v1/mybookings', bookingController.handleGetUserBooking)
+router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode)
+router.delete('/v1/bookings')
 
 router.use(authController.onLost);
 router.use(authController.onError);
