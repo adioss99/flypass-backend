@@ -22,6 +22,7 @@ router.get('/', getStarted);
 // profile
 router.get('/v1/user', authorize, userController.getProfile);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
+router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
 
 // flight
 router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
