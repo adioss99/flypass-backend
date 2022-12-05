@@ -32,7 +32,7 @@ function checkPassword(encryptedPassword, password) {
 
 function createToken(payload) {
   const access = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6h' });
-  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '6h' });
+  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
   return [access, refresh]
 }
 
@@ -63,7 +63,7 @@ const registerAdmin = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const email = req.body.email.toLowerCase(); // Biar case insensitive
+  const email = req.body.email.toLowerCase();
   const { password } = req.body;
 
   const user = await User.findOne({
@@ -88,6 +88,7 @@ const login = async (req, res) => {
   const token = createToken({
     id: user.id,
     email: user.email,
+    roleId: user.roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   });
@@ -177,7 +178,7 @@ const refreshToken = async (req, res) => {
         refreshToken: refresh,
       },
     });
-    if (!user[0]) {
+    if (!user) {
       res.sendStatus(403);
       return
     }
@@ -186,15 +187,17 @@ const refreshToken = async (req, res) => {
         res.sendStatus(403);
         return;
       }
-      const userId = user[0].id;
-      const { name } = user[0].name;
-      const { email } = user[0].email;
-      const accessToken = jwt.sign({ userId, name, email }, process.env.ACCESS_TOKEN_SECRET, {
+      const userId = user.id;
+      const {
+        email, createdAt, updatedAt, roleId,
+      } = user;
+      const accessToken = jwt.sign({
+        userId, email, roleId, createdAt, updatedAt,
+      }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: '6h',
       });
       res.json({
         userId,
-        name,
         email,
         accessToken,
       });
