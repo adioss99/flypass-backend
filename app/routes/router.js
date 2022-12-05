@@ -36,6 +36,7 @@ router.post('/v1/login', authController.login);
 router.post('/v1/register', emailExist, authController.register);
 router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
 router.get('/v1/whoami', authorize, authController.whoAmI);
+router.get('/v1/getalluser', authorize, isAdmin, authController.getAlluser);
 router.get('/v1/refresh', authController.refreshToken);
 router.get('/v1/logout', authController.logout);
 
