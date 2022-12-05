@@ -120,20 +120,6 @@ const whoAmI = async (req, res) => {
   res.status(200).json(req.user);
 };
 
-const getAlluser = async (req, res) => {
-  try {
-    const user = await User.findAll();
-    res.status(201).json({ user });
-  } catch (err) {
-    res.status(422).json({
-      error: {
-        name: err.name,
-        message: err.message,
-      },
-    });
-  }
-};
-
 const logout = async (req, res) => {
   try {
     const refreshToken = req.body.refreshToken === undefined || req.body.refreshToken === null ? req.cookies.refreshToken : req.body.refreshToken;
@@ -216,7 +202,6 @@ module.exports = {
   register,
   registerAdmin,
   login,
-  getAlluser,
   whoAmI,
   logout,
   refreshToken,
