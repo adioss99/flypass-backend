@@ -94,13 +94,22 @@ const handleSearchBookingByCode = async (req, res) => {
 const handleGetUserBooking = async (req, res) => {
   try {
     const user = userToken(req)
-    const booking = await Booking.findAll({
-      include: { all: true },
-      where: {
-        userId: user.id,
-      },
-    })
-    res.status(200).json({ booking })
+    if (user != null) {
+      const booking = await Booking.findAll({
+        include: { all: true },
+        where: {
+          userId: user.id,
+        },
+      })
+      res.status(200).json({ booking })
+    } else {
+      res.status(404).json({
+        error: {
+          message:
+          'you have too be logged in see your booking',
+        },
+      })
+    }
   } catch (err) {
     res.status(404).json({
       error: {

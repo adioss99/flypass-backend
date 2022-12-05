@@ -40,7 +40,12 @@ module.exports = {
         }
       },
       bookingStatusId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName: 'BookingStatuses'
+          }
+        }
       },
       passengerQty: {
         type: Sequelize.INTEGER,
