@@ -22,6 +22,7 @@ router.get('/', getStarted);
 // profile
 router.get('/v1/user', authorize, userController.getProfile);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
+router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
 
 // flight
 router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
@@ -36,7 +37,6 @@ router.post('/v1/login', authController.login);
 router.post('/v1/register', emailExist, authController.register);
 router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
 router.get('/v1/whoami', authorize, authController.whoAmI);
-router.get('/v1/getalluser', authorize, isAdmin, authController.getAlluser);
 router.get('/v1/refresh', authController.refreshToken);
 router.get('/v1/logout', authController.logout);
 

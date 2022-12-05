@@ -1,4 +1,4 @@
-const { User } = require('../../models');
+const { User, Role } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
 
 const getProfile = async (req, res) => {
@@ -68,7 +68,26 @@ const updateProfiles = async (req, res) => {
   }
 };
 
+const getAlluser = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'gender', 'birthDate', 'email', 'phone', 'image'],
+      include: Role,
+      order: [['roleId', 'ASC']],
+    });
+    res.status(201).json({ users });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 module.exports = {
   updateProfiles,
   getProfile,
+  getAlluser,
 };
