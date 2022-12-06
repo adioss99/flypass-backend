@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Role, {
         foreignKey: 'roleId',
       });
+      this.hasMany(models.Booking,{
+        foreignKey: 'userId'
+      })
     }
   }
   User.init(

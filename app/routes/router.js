@@ -8,6 +8,7 @@ const {
   airlineController,
   airplaneController,
   airportController,
+  bookingController,
   whistlistController,
 } = require('../controllers');
 
@@ -19,7 +20,7 @@ const router = express.Router();
 
 router.get('/', getStarted);
 
-// profile
+// user
 router.get('/v1/user', authorize, userController.getProfile);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
@@ -56,6 +57,13 @@ router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.delete
 
 // airport
 router.get('/v1/airport', airportController.getAirport);
+
+// booking
+router.post('/v1/flights/books', bookingController.handleBookFlight)
+router.get('/v1/bookings/all', bookingController.handleListBookings)
+router.get('/v1/bookings', bookingController.handleGetUserBooking)
+router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode)
+router.delete('/v1/bookings')
 
 // whistlist
 router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
