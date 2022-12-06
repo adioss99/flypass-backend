@@ -1,12 +1,47 @@
-/* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 const { Op } = require('sequelize');
-const moment = require('moment')
+const moment = require('moment');
 const {
-  Flight, Airport, Airline, Airplane,
+  Flight, Airport, Airline, Airplane, FlightType, FlightClass,
 } = require('../../models');
 
+const getDuration = (start, end) => {
+  const x = moment(start, 'hh:mm:ss');
+  const y = moment(end, 'hh:mm:ss');
+  const dif = y.diff(x);
+  const dur = moment.utc(dif).format('HH:mm:ssss');
+  return dur;
+};
+
+const isSameCountry = async (departure, arrival) => {
+  const departureAirportCountry = await Airport.findByPk(departure);
+  const arrivalAirportCountry = await Airport.findByPk(arrival);
+  return departureAirportCountry.country === arrivalAirportCountry.country ? 1 : 0;
+};
+
 const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
+const inc = [
+  {
+    model: Airline,
+  },
+  {
+    model: Airplane,
+  },
+  {
+    model: FlightClass,
+  },
+  {
+    model: FlightType,
+  },
+  {
+    model: Airport,
+    as: 'departureAirport',
+  },
+  {
+    model: Airport,
+    as: 'arrivalAirport',
+  },
+];
 
 const handleListFlights = async (req, res) => {
   // nanti bakal, implement pagination
@@ -17,7 +52,7 @@ const handleListFlights = async (req, res) => {
         isAvailable: { [Op.is]: true },
       },
       attributes: flightAttr,
-      include: { all: true },
+      include: inc,
       offset: 0,
       limit: 10,
     });
@@ -26,11 +61,12 @@ const handleListFlights = async (req, res) => {
     res.status(404).json(err);
   }
 };
+
 const handleGetFlight = async (req, res) => {
   try {
     const flights = await Flight.findByPk(req.params.id, {
       attributes: flightAttr,
-      include: { all: true },
+      include: inc,
     });
     res.status(200).json(flights);
   } catch (err) {
@@ -39,7 +75,7 @@ const handleGetFlight = async (req, res) => {
 };
 
 const handleSearchFlight = async (req, res) => {
-  const { depDate, depAirport, arrAirport } = req.query
+  const { depDate, depAirport, arrAirport } = req.query;
   try {
     const flights = await Flight.findAll({
       attributes: flightAttr,
@@ -49,7 +85,16 @@ const handleSearchFlight = async (req, res) => {
       },
       include: [
         {
-          all: true,
+          model: Airline,
+        },
+        {
+          model: Airplane,
+        },
+        {
+          model: FlightClass,
+        },
+        {
+          model: FlightType,
         },
         {
           model: Airport,
@@ -72,7 +117,7 @@ const handleSearchFlight = async (req, res) => {
       },
     });
   }
-}
+};
 
 const handleCreateFlight = async (req, res) => {
   try {
@@ -179,22 +224,8 @@ const handleUpdateFlight = async (req, res) => {
 
 const handleDeleteFlight = async (req, res) => {
   const flights = await Flight.destroy({ where: { id: req.params.id } });
-  res.status(204).end();
+  res.status(204).json({ message: `Flight with Id ${flights.id} deleted` });
 };
-
-const getDuration = (start, end) => {
-  const x = moment(start, 'hh:mm:ss')
-  const y = moment(end, 'hh:mm:ss')
-  const dif = y.diff(x)
-  const dur = moment.utc(dif).format('HH:mm:ssss')
-  return dur
-}
-
-const isSameCountry = async (departure, arrival) => {
-  const departureAirportCountry = await Airport.findByPk(departure)
-  const arrivalAirportCountry = await Airport.findByPk(arrival)
-  return departureAirportCountry.country === arrivalAirportCountry.country ? 1 : 0
-}
 
 module.exports = {
   handleListFlights,
@@ -203,4 +234,5 @@ module.exports = {
   handleCreateFlight,
   handleUpdateFlight,
   handleDeleteFlight,
+  inc,
 };

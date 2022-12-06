@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// const validationResult = require('express-validator');
 const { User } = require('../../models');
 
 const SALT = 10;
@@ -33,7 +32,7 @@ function checkPassword(encryptedPassword, password) {
 
 function createToken(payload) {
   const access = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6h' });
-  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '6h' });
+  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
   return [access, refresh]
 }
 
@@ -57,10 +56,6 @@ const register = async (req, res, roles) => {
   res.status(201).json({
     message: 'register success',
   });
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty(confirmationPassword)) {
-  //   res.status(400).json({ errors: errors.array() });
-  // }
 };
 
 const registerAdmin = async (req, res) => {
@@ -68,7 +63,7 @@ const registerAdmin = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const email = req.body.email.toLowerCase(); // Biar case insensitive
+  const email = req.body.email.toLowerCase();
   const { password } = req.body;
 
   const user = await User.findOne({
@@ -93,6 +88,7 @@ const login = async (req, res) => {
   const token = createToken({
     id: user.id,
     email: user.email,
+    roleId: user.roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   });
@@ -168,7 +164,7 @@ const refreshToken = async (req, res) => {
         refreshToken: refresh,
       },
     });
-    if (!user[0]) {
+    if (!user) {
       res.sendStatus(403);
       return
     }
@@ -177,21 +173,28 @@ const refreshToken = async (req, res) => {
         res.sendStatus(403);
         return;
       }
-      const userId = user[0].id;
-      const { name } = user[0].name;
-      const { email } = user[0].email;
-      const accessToken = jwt.sign({ userId, name, email }, process.env.ACCESS_TOKEN_SECRET, {
+      const userId = user.id;
+      const {
+        email, createdAt, updatedAt, roleId,
+      } = user;
+      const accessToken = jwt.sign({
+        userId, email, roleId, createdAt, updatedAt,
+      }, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: '6h',
       });
       res.json({
         userId,
-        name,
         email,
         accessToken,
       });
     });
-  } catch (error) {
-    res.send(403).json({ message: 'refreshToken error' })
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 };
 
