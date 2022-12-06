@@ -13,16 +13,21 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Role, {
         foreignKey: 'roleId',
       });
+      this.hasMany(models.Booking,{
+        foreignKey: 'userId'
+      })
     }
   }
   User.init(
     {
       name: DataTypes.STRING,
-      encryptedPassword: DataTypes.STRING,
+      gender: DataTypes.STRING,
+      birthDate: DataTypes.STRING,
       email: DataTypes.STRING,
       phone: DataTypes.STRING,
       image: DataTypes.STRING,
       imageId: DataTypes.STRING,
+      encryptedPassword: DataTypes.STRING,
       refreshToken: DataTypes.TEXT,
       roleId: DataTypes.INTEGER,
     },

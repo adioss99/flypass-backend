@@ -30,6 +30,17 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.FlightClass,{
         foreignKey: 'flightClassId'
       })
+      // this.hasMany(models.Booking,{
+      //   foreignKey: 'flight1Id'
+
+      // })
+      // this.hasMany(models.Booking,{
+      //   foreignKey: 'flight2Id'
+      // })
+      });
+      this.hasMany(models.Whistlist, {
+        foreignKey: 'flightId'
+      });
     }
   }
   Flight.init(
@@ -46,6 +57,9 @@ module.exports = (sequelize, DataTypes) => {
       duration: DataTypes.TIME,
       flightTypeId: DataTypes.INTEGER,
       flightClassId: DataTypes.INTEGER,
+      price: DataTypes.DOUBLE,
+      baggage: DataTypes.INTEGER,
+      isAvailable: DataTypes.BOOLEAN,
     },
     {
       sequelize,

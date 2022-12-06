@@ -10,15 +10,28 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+<<<<<<< HEAD
       // define association here
+=======
+      this.belongsToMany(models.Booking, {
+        through: 'PassengerBooking',
+        foreignKey: 'passengerId'
+      })
+>>>>>>> ea5e64683cac2ccb42de8319958ccceeeb62e040
     }
   }
   Passenger.init({
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
+<<<<<<< HEAD
     email: DataTypes.STRING,
     identityType: DataTypes.STRING,
     indentityNumber: DataTypes.STRING
+=======
+    identityType: DataTypes.STRING,
+    identityNumber: DataTypes.STRING,
+    age: DataTypes.STRING
+>>>>>>> ea5e64683cac2ccb42de8319958ccceeeb62e040
   }, {
     sequelize,
     modelName: 'Passenger',

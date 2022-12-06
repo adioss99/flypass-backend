@@ -19,6 +19,8 @@ module.exports = {
         flightTypeId: 1,
         price: 500000,
         flightClassId: 1,
+        baggage: 20,
+        isAvailable: true,
         createdAt : timestamp,
         updatedAt : timestamp,
      },
@@ -36,6 +38,8 @@ module.exports = {
       flightTypeId: 1,
       price: 650000,
       flightClassId: 1,
+      baggage: 18,
+      isAvailable: true,
       createdAt : timestamp,
       updatedAt : timestamp,
      }
