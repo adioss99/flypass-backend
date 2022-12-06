@@ -39,6 +39,14 @@ module.exports = {
           }
         }
       },
+      passengerContactId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: {
+            tableName: 'PassengerContacts'
+          }
+        }
+      },
       bookingStatusId: {
         type: Sequelize.INTEGER,
         references:{

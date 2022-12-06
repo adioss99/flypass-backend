@@ -6,6 +6,7 @@ const {
   Passenger,
   Booking,
   BookingStatus,
+  PassengerContact,
   PassengerBooking,
   Flight,
 } = require('../../models');
@@ -23,6 +24,9 @@ const handleListBookings = async (req, res) => {
           as: 'flight2',
         },
         {
+          model: PassengerContact,
+        },
+        {
           model: BookingStatus,
         },
         {
@@ -30,7 +34,7 @@ const handleListBookings = async (req, res) => {
         },
       ],
     });
-    res.status(200).json(booking);
+    res.status(200).json({ booking });
   } catch (err) {
     res.status(404).json({
       error: {
@@ -44,8 +48,23 @@ const handleListBookings = async (req, res) => {
 const handleBookFlight = async (req, res) => {
   try {
     const user = userToken(req);
-    const { flight1Id, flight2Id } = req.body;
+    const {
+      contactTitle,
+      contactFirstName,
+      contactLastName,
+      contactPhone,
+      contactEmail,
+      flight1Id,
+      flight2Id,
+    } = req.body;
     const passengerData = req.body.passenger;
+    const passengerContact = await PassengerContact.create({
+      title: contactTitle,
+      firstName: contactFirstName,
+      lastName: contactLastName,
+      phone: contactPhone,
+      email: contactEmail,
+    })
     const passenger = await Passenger.bulkCreate(passengerData);
     const passengerQty = passenger.length;
     const totalPrice = await countTotalPrice(
@@ -59,6 +78,7 @@ const handleBookFlight = async (req, res) => {
       flight2Id,
       roundtrip: flight2Id != null,
       userId: user != null ? user.id : user,
+      passengerContactId: passengerContact.id,
       bookingStatusId: 1,
       passengerQty,
       totalPrice,
@@ -70,7 +90,9 @@ const handleBookFlight = async (req, res) => {
     const passengerBooking = await PassengerBooking.bulkCreate(
       passengerBookingData,
     );
-    res.status(200).json({ booking, passenger, passengerBooking });
+    res.status(200).json({
+      booking, passengerContact, passenger, passengerBooking,
+    });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -95,6 +117,9 @@ const handleSearchBookingByCode = async (req, res) => {
         {
           model: Flight,
           as: 'flight2',
+        },
+        {
+          model: PassengerContact,
         },
         {
           model: BookingStatus,
@@ -128,6 +153,9 @@ const handleGetUserBooking = async (req, res) => {
           {
             model: Flight,
             as: 'flight2',
+          },
+          {
+            model: PassengerContact,
           },
           {
             model: BookingStatus,

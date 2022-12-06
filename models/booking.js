@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.BookingStatus,{
         foreignKey: 'bookingStatusId'
       })
+      this.belongsTo(models.PassengerContact,{
+        foreignKey: 'passengerContactId'
+      })
     }
   }
   Booking.init({
@@ -37,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     flight1Id: DataTypes.INTEGER,
     flight2Id: DataTypes.INTEGER,
     userId: DataTypes.INTEGER,
+    passengerContactId: DataTypes.INTEGER,
     bookingStatusId: DataTypes.INTEGER,
     passengerQty: DataTypes.INTEGER,
     totalPrice: DataTypes.DOUBLE
