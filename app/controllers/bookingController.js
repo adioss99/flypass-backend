@@ -1,6 +1,4 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-plusplus */
-const randomstring = require('randomstring')
+const randomstring = require('randomstring');
 const jwt = require('jsonwebtoken');
 const {
   Passenger,
@@ -10,6 +8,26 @@ const {
   PassengerBooking,
   Flight,
 } = require('../../models');
+
+const decodeToken = (token) => jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+const userToken = (req) => {
+  try {
+    const token = req.headers.authorization?.split('Bearer ')[1];
+    const payload = decodeToken(token);
+    return payload;
+  } catch (error) {
+    const payload = null;
+    return payload;
+  }
+};
+
+const countTotalPrice = async (flight1, flight2, qty) => {
+  const Flight1 = await Flight.findByPk(flight1);
+  const Flight2 = flight2 !== undefined ? await Flight.findByPk(flight2) : 0;
+  const result = Flight1.price * qty + (Flight2 !== 0 ? Flight2.price : Flight2 * qty);
+  return result;
+};
 
 const handleListBookings = async (req, res) => {
   try {
@@ -185,29 +203,10 @@ const handleGetUserBooking = async (req, res) => {
     });
   }
 };
+
 const handleDeleteBooking = async (req, res) => {
-  const booking = await Booking.destroy({ where: { id: req.params.id } });
+  await Booking.destroy({ where: { id: req.params.id } });
   res.status(204).end();
-};
-
-const userToken = (req) => {
-  try {
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    const payload = decodeToken(token);
-    return payload;
-  } catch (error) {
-    const payload = null;
-    return payload;
-  }
-};
-
-const decodeToken = (token) => jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-const countTotalPrice = async (flight1, flight2, qty) => {
-  const Flight1 = await Flight.findByPk(flight1);
-  const Flight2 = flight2 !== undefined ? await Flight.findByPk(flight2) : 0;
-  const result = Flight1.price * qty + (Flight2 !== 0 ? Flight2.price : Flight2 * qty);
-  return result;
 };
 
 module.exports = {

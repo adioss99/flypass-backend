@@ -4,7 +4,7 @@ const userController = require('./userController');
 const airlineController = require('./airlineController');
 const airplaneController = require('./airplaneController');
 const airportController = require('./airportController');
-const bookingController = require('./bookingController')
+const bookingController = require('./bookingController');
 const whistlistController = require('./whistlistController');
 const transactionmethodController = require('./transactionmethodController');
 
@@ -13,7 +13,7 @@ const getStarted = (req, res) => {
     message: 'flypass API ready',
     status: 'take off',
   });
-}
+};
 
 module.exports = {
   getStarted,
