@@ -60,9 +60,9 @@ router.get('/v1/airport', airportController.getAirport);
 
 // booking
 router.post('/v1/flights/books', bookingController.handleBookFlight)
-router.get('/v1/bookings/all', bookingController.handleListBookings)
+router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListBookings);
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
-router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode)
+router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
 router.delete('/v1/bookings')
 
 // whistlist
