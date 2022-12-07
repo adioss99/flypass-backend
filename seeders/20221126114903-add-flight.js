@@ -1,49 +1,47 @@
 'use strict';
+const randomString = require('randomstring')
+const momentRandom = require('moment-random')
 const moment = require('moment')
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
     const timestamp = new Date()
-    await queryInterface.bulkInsert('Flights',[
-      {
-        flightCode : 'GA-718',
-        airlineId : 1,
-        airplaneId : 1,
-        departureAirportId: 1,
-        arrivalAirportId: 2,
-        departureDate: timestamp,
-        arrivalDate: timestamp,
-        departureTime: timestamp,
-        arrivalTime: timestamp,
-        duration: timestamp,
-        flightTypeId: 1,
-        price: 500000,
-        flightClassId: 1,
-        baggage: 20,
-        isAvailable: true,
-        createdAt : timestamp,
-        updatedAt : timestamp,
-     },
-     {
-      flightCode : 'GA-721',
-      airlineId : 1,
-      airplaneId : 1,
-      departureAirportId: 2,
-      arrivalAirportId: 1,
-      departureDate: timestamp,
-      arrivalDate: timestamp,
-      departureTime: timestamp,
-      arrivalTime: timestamp,
-      duration: timestamp,
-      flightTypeId: 1,
-      price: 650000,
-      flightClassId: 1,
-      baggage: 18,
-      isAvailable: true,
-      createdAt : timestamp,
-      updatedAt : timestamp,
+    function RandomMinMax(min,max){
+      return Math.round(Math.floor(Math.random() * (max - min)) + min);
+     
      }
-    ])
+     const generateFlights = (departureAirportId, arrivalAirportId, duration, flightTypeId) => {
+      const randomDate = moment(momentRandom('20230107', '20221207')).format('YYYY-MM-DD')
+      const randomTime = moment().hour((RandomMinMax(1, 12)))
+      const dur = moment.utc(duration, 'hh:mm').format('hh:mm')
+      const data = {
+        flightCode: `GA-${randomString.generate({ length: 3, charset: 'numeric' })}`,
+        airlineId: 1,
+        airplaneId: 1,
+        departureAirportId,
+        arrivalAirportId,
+        departureDate: randomDate,
+        duration: dur,
+        arrivalDate: randomDate,
+        departureTime: moment(randomTime).format('hh:mm'),
+        arrivalTime: moment(randomTime).add(duration, 'hours').format('hh:mm'),
+        flightTypeId,
+        flightClassId: 1,
+        price: RandomMinMax(5, 15) * 100000,
+        baggage: RandomMinMax(15, 25),
+        isAvailable: true,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }
+      return data
+    }
+    let data = []
+    for (let i = 0; i < 10; i++) {
+      const newData = generateFlights(5945, 5793, '01:30', 1)
+      data.push(newData)
+    }
+    
+    await queryInterface.bulkInsert('Flights', data)
   },
 
   async down (queryInterface, Sequelize) {
