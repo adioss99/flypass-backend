@@ -29,6 +29,12 @@ router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 
+router.post(
+  '/v1/Payment/insert',
+  uploadOnMemory.single('image'),
+  transactionmethodController.savePayment,
+);
+
 // >>>>>>>>>>>
 router.use(form.array());
 
@@ -80,7 +86,6 @@ router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistli
 router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
 
 // transactionmethod
-router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
 router.get('/v1/payment/findall', transactionmethodController.getallPayment);
 router.delete('/v1/payment/:id', transactionmethodController.deletePayment);
 
