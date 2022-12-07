@@ -28,7 +28,6 @@ router.get('/', getStarted);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
-
 router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
 
 // >>>>>>>>>>>
