@@ -1,4 +1,7 @@
 const express = require('express');
+const multer = require('multer');
+
+const form = multer();
 
 const {
   getStarted,
@@ -21,9 +24,16 @@ const router = express.Router();
 
 router.get('/', getStarted);
 
+// image
+router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
+router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
+router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
+
+// >>>>>>>>>>>
+router.use(form.array());
+
 // user
 router.get('/v1/user', authorize, userController.getProfile);
-router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
 
 // flight
@@ -45,9 +55,7 @@ router.get('/v1/logout', authController.logout);
 // airline
 router.get('/v1/airlines', airlineController.getAirlines);
 router.get('/v1/airlines/:id', airlineController.getAirline);
-router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 router.delete('/v1/airlines/:id', authorize, isAdmin, airlineController.deleteAirline);
-router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 
 // airplane
 router.get('/v1/airplanes', airplaneController.getAirplanes);
@@ -61,9 +69,9 @@ router.get('/v1/airport', airportController.getAirport);
 
 // booking
 router.post('/v1/flights/books', bookingController.handleBookFlight)
-router.get('/v1/bookings/all', bookingController.handleListBookings)
+router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListBookings);
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
-router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode)
+router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
 router.delete('/v1/bookings')
 
 // whistlist
