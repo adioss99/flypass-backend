@@ -107,10 +107,15 @@ const handleSearchFlight = async (req, res) => {
           where: { iata: arrAirport },
         },
       ],
-    });
-    res.status(200).json({ flights });
+    })
+    res.status(200).json({ flights })
   } catch (err) {
-    res.status(404).json(err);
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
   }
 };
 
@@ -131,8 +136,8 @@ const handleCreateFlight = async (req, res) => {
       baggage,
       isAvailable,
     } = req.body;
-    const dur = getDuration(departureTime, arrivalTime);
-    const flightType = await isSameCountry(departureAirportId, arrivalAirportId);
+    const dur = getDuration(departureTime, arrivalTime)
+    const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flights = await Flight.create({
       flightCode,
       airlineId,
@@ -182,8 +187,8 @@ const handleUpdateFlight = async (req, res) => {
       baggage,
       isAvailable,
     } = req.body;
-    const dur = getDuration(departureTime, arrivalTime);
-    const flightType = await isSameCountry(departureAirportId, arrivalAirportId);
+    const dur = getDuration(departureTime, arrivalTime)
+    const flightType = await isSameCountry(departureAirportId, arrivalAirportId)
     const flights = await Flight.findByPk(req.params.id);
     await flights.update({
       flightCode,
@@ -206,7 +211,7 @@ const handleUpdateFlight = async (req, res) => {
       flights,
       status: 'Ok',
       message: `Flight with Id ${flights.id} updated`,
-    });
+    })
   } catch (err) {
     res.status(422).json({
       error: {
