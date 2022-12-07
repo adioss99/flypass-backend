@@ -71,9 +71,10 @@ router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
 router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
 router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
 
-// ransactionmethod
-router.post('/v1/Payment/insert', transactionmethodController.savePayment);
+// transactionmethod
+router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
 router.get('/v1/payment/findall', transactionmethodController.getallPayment);
+router.delete('/v1/payment/:id', transactionmethodController.deletePayment);
 
 router.use(authController.onLost);
 router.use(authController.onError);

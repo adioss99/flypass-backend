@@ -15,7 +15,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Transactionmethod.init({
     name: DataTypes.STRING,
-    accountNumber: DataTypes.INTEGER
+    accountNumber: DataTypes.INTEGER,
+    image: DataTypes.STRING,
+    imageId: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Transactionmethod',
