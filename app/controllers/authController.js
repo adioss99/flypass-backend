@@ -38,9 +38,7 @@ function createToken(payload) {
 
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
-  const {
-    name, password, confirmationPassword, birthDate, gender, phone,
-  } = req.body;
+  const { name, password, confirmationPassword } = req.body;
   const role = roles !== 1 ? 2 : 1;
   if (password !== confirmationPassword) {
     res.status(401).json({ message: 'password doesn`t match' })
@@ -49,12 +47,9 @@ const register = async (req, res, roles) => {
   const encryptedPassword = await encryptPassword(password);
 
   await User.create({
+    name,
     email,
     encryptedPassword,
-    name,
-    birthDate: new Date(birthDate).toISOString(),
-    gender,
-    phone,
     roleId: role,
   });
 
@@ -92,7 +87,12 @@ const login = async (req, res) => {
 
   const token = createToken({
     id: user.id,
+    name: user.name,
+    image: user.image,
     email: user.email,
+    birthDate: user.birthDate,
+    gender: user.gender,
+    phone: user.phone,
     roleId: user.roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
