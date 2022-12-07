@@ -6,6 +6,7 @@ const airplaneController = require('./airplaneController');
 const airportController = require('./airportController');
 const bookingController = require('./bookingController')
 const whistlistController = require('./whistlistController');
+const transactionmethodController = require('./transactionmethodController');
 
 const getStarted = (req, res) => {
   res.status(200).json({
@@ -24,4 +25,5 @@ module.exports = {
   airportController,
   bookingController,
   whistlistController,
+  transactionmethodController,
 };

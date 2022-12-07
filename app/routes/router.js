@@ -10,6 +10,7 @@ const {
   airportController,
   bookingController,
   whistlistController,
+  transactionmethodController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -69,6 +70,10 @@ router.delete('/v1/bookings')
 router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
 router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
 router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
+
+// ransactionmethod
+router.post('/v1/Payment/insert', transactionmethodController.savePayment);
+router.get('/v1/payment/findall', transactionmethodController.getallPayment);
 
 router.use(authController.onLost);
 router.use(authController.onError);
