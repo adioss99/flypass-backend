@@ -38,7 +38,7 @@ const savePayment = async (req, res) => {
 const deletePayment = async (req, res) => {
   try {
     await Transactionmethod.destroy({ where: { id: req.params.id } });
-    res.status(202).json({ message: `data ${req.params.id} deleted` });
+    res.status(202).json({ message: `payment ${req.params.id} is deleted` });
   } catch (err) {
     res.status(422).json({
       error: {
