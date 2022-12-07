@@ -29,6 +29,8 @@ router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 
+router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
+
 // >>>>>>>>>>>
 router.use(form.array());
 
@@ -79,9 +81,9 @@ router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
 router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
 router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
 
-// ransactionmethod
-router.post('/v1/Payment/insert', transactionmethodController.savePayment);
-router.get('/v1/payment/findall', transactionmethodController.getallPayment);
+// transactionmethod
+router.get('/v1/payment/findall', authorize, isAdmin, transactionmethodController.getallPayment);
+router.delete('/v1/payment/:id', authorize, isAdmin, transactionmethodController.deletePayment);
 
 router.use(authController.onLost);
 router.use(authController.onError);
