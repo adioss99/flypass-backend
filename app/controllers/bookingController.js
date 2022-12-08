@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-plusplus */
 const randomstring = require('randomstring')
