@@ -129,7 +129,9 @@ const handleGoogleAuthCb = async (req, res) => {
 
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
-  const { name, password, confirmationPassword } = req.body;
+  const {
+    name, password, confirmationPassword, birthDate, gender, phone,
+  } = req.body;
   const role = roles !== 1 ? 2 : 1;
   if (password !== confirmationPassword) {
     res.status(401).json({ message: 'password doesn`t match' });
@@ -141,6 +143,9 @@ const register = async (req, res, roles) => {
     name,
     email,
     encryptedPassword,
+    birthDate: new Date(birthDate).toISOString(),
+    gender,
+    phone,
     roleId: role,
   });
   res.status(201).json({
@@ -177,7 +182,12 @@ const login = async (req, res) => {
 
   const token = createToken({
     id: user.id,
+    name: user.name,
+    image: user.image,
     email: user.email,
+    birthDate: user.birthDate,
+    gender: user.gender,
+    phone: user.phone,
     roleId: user.roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -271,11 +281,16 @@ const refreshToken = async (req, res) => {
       } = user;
       const accessToken = jwt.sign(
         {
-          userId,
-          email,
-          roleId,
-          createdAt,
-          updatedAt,
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          email: user.email,
+          birthDate: user.birthDate,
+          gender: user.gender,
+          phone: user.phone,
+          roleId: user.roleId,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
