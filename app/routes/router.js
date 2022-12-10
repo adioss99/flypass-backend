@@ -32,6 +32,12 @@ router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), 
 
 router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
 
+router.post('/v1/pay/create', uploadOnMemory.single('image'), transaction.transactionHandle);
+router.get('/v1/pay/:id', transaction.gettranscationId);
+router.put('/v1/pay/update/:id', transaction.handlepayment);
+router.put('/v1/pay/confirm/:id', transaction.handleConfirmPayment);
+router.put('/v1/pay/reject/:id', transaction.handleRejectPayment);
+
 // >>>>>>>>>>>
 router.use(form.array());
 
@@ -87,7 +93,6 @@ router.get('/v1/payment/findall', authorize, isAdmin, transactionmethodControlle
 router.delete('/v1/payment/:id', authorize, isAdmin, transactionmethodController.deletePayment);
 
 // transcation
-router.get('/v1/pay/findall', transaction.getalltranscation);
 
 router.use(authController.onLost);
 router.use(authController.onError);
