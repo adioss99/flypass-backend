@@ -14,7 +14,6 @@ const imageUploader = async (req, res, fileBase64) => {
 const savePayment = async (req, res) => {
   try {
     const { name, accountNumber } = req.body;
-
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
 
@@ -62,7 +61,6 @@ const getallPayment = async (req, res) => {
     });
   }
 }
-
 module.exports = {
   savePayment,
   getallPayment,
