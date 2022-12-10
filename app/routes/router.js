@@ -14,6 +14,7 @@ const {
   bookingController,
   whistlistController,
   transactionmethodController,
+  transaction,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -85,6 +86,9 @@ router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWh
 // transactionmethod
 router.get('/v1/payment/findall', authorize, isAdmin, transactionmethodController.getallPayment);
 router.delete('/v1/payment/:id', authorize, isAdmin, transactionmethodController.deletePayment);
+
+// transcation
+router.get('/v1/pay/findall', transaction.getalltranscation);
 
 router.use(authController.onLost);
 router.use(authController.onError);
