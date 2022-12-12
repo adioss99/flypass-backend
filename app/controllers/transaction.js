@@ -1,10 +1,10 @@
 // getall transaction
 // konfirmasi (acc,reject)
 
-const { Transaction, Transactionmethod } = require('../../models');
+const { Transaction } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
 
-const method = ['name', 'accountNumber', 'image', 'imageId']
+// const method = ['name', 'accountNumber', 'image', 'imageId']
 
 const imageUploader = async (req, res, fileBase64) => {
   const file = `data:${req.file.mimetype};base64,${fileBase64}`;
@@ -20,10 +20,12 @@ const transactionHandle = async (req, res) => {
   try {
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    const { bookingId } = req.body
+    const { bookingId, TransactionMethodId } = req.body;
     const transaction = await Transaction.create({
       bookingId,
-      ispayed: false,
+      TransactionMethodId,
+      datePayed: new Date(),
+      isPayed: false,
       Image: img[0],
     });
     res.status(201).json({ transaction });
@@ -39,13 +41,10 @@ const transactionHandle = async (req, res) => {
 
 const gettranscationId = async (req, res) => {
   try {
-    const { TransactionMethodId } = req.body;
-    const transaction = await Transaction.findByPK(
-      TransactionMethodId,
-      {
-        include: { all: true },
-      },
-    )
+    // const { transactionId } = req.params.id;
+    const transaction = await Transaction.findByPk(
+      req.params.id,
+    );
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
@@ -83,8 +82,8 @@ const handlepayment = async (req, res) => {
 
 const handleConfirmPayment = async (req, res) => {
   try {
-    const { transactionId } = req.body
-    const transaction = await Transaction.findByPk(transactionId)
+    // const { transactionId } = req.params.id
+    const transaction = await Transaction.findByPk(req.params.id)
     await transaction.update({
       isPayed: true,
     })
@@ -105,8 +104,8 @@ const handleConfirmPayment = async (req, res) => {
 }
 const handleRejectPayment = async (req, res) => {
   try {
-    const { transactionId } = req.body
-    const transaction = await Transaction.findByPK(transactionId)
+    // const { transactionId } = req.body
+    const transaction = await Transaction.findByPk(req.params.id)
     await transaction.update({
       isPayed: false,
     })
