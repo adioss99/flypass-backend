@@ -60,12 +60,12 @@ const handlepayment = async (req, res) => {
   try {
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    const { transactionid } = req.body;
-    const transaction = await Transaction.findByPk(transactionid)
+    // const { transactionid } = req.body;
+    const transaction = await Transaction.findByPk(req.params.id)
     // eslint-disable-next-line no-unused-expressions
     await transaction.update({
       Image: img[0],
-      isPayed: true,
+      // isPayed: true,
       datePayed: new Date(),
     // eslint-disable-next-line no-sequences
     }),
@@ -108,6 +108,10 @@ const handleRejectPayment = async (req, res) => {
     const transaction = await Transaction.findByPk(req.params.id)
     await transaction.update({
       isPayed: false,
+    })
+    res.status(201).json({
+      transaction,
+      message: 'Payment fail ',
     })
   } catch (err) {
     res.status(422).json({
