@@ -14,25 +14,7 @@ const {
 const handleListBookings = async (req, res) => {
   try {
     const booking = await Booking.findAll({
-      include: [
-        {
-          model: Flight,
-          as: 'flight1',
-        },
-        {
-          model: Flight,
-          as: 'flight2',
-        },
-        {
-          model: PassengerContact,
-        },
-        {
-          model: BookingStatus,
-        },
-        {
-          model: Passenger,
-        },
-      ],
+      include: { all: true, nested: true },
     });
     res.status(200).json({ booking });
   } catch (err) {
@@ -105,7 +87,7 @@ const handleBookFlight = async (req, res) => {
       bookingStatusId: 1,
       passengerQty,
       totalPassengerBaggagePrice:
-        totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
+      totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
       totalPrice,
     });
     const passengerBookingData = passenger.map((e) => ({
@@ -137,25 +119,7 @@ const handleSearchBookingByCode = async (req, res) => {
       where: {
         bookingCode: req.query.bookingcode,
       },
-      include: [
-        {
-          model: Flight,
-          as: 'flight1',
-        },
-        {
-          model: Flight,
-          as: 'flight2',
-        },
-        {
-          model: PassengerContact,
-        },
-        {
-          model: BookingStatus,
-        },
-        {
-          model: Passenger,
-        },
-      ],
+      include: { all: true, nested: true },
     });
     res.status(200).json({ booking });
   } catch (err) {
@@ -176,25 +140,7 @@ const handleGetUserBooking = async (req, res) => {
         where: {
           userId: user.id,
         },
-        include: [
-          {
-            model: Flight,
-            as: 'flight1',
-          },
-          {
-            model: Flight,
-            as: 'flight2',
-          },
-          {
-            model: PassengerContact,
-          },
-          {
-            model: BookingStatus,
-          },
-          {
-            model: Passenger,
-          },
-        ],
+        include: { all: true, nested: true },
       });
       res.status(200).json({ booking });
     } else {

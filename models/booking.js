@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Flight,{
         foreignKey: 'flight2Id',
         as: 'flight2'
-
       })
       this.belongsTo(models.User,{
         foreignKey: 'userId'
