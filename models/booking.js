@@ -43,6 +43,7 @@ module.exports = (sequelize, DataTypes) => {
     passengerContactId: DataTypes.INTEGER,
     bookingStatusId: DataTypes.INTEGER,
     passengerQty: DataTypes.INTEGER,
+    totalPassengerBaggagePrice: DataTypes.INTEGER,
     totalPrice: DataTypes.DOUBLE
   }, {
     sequelize,

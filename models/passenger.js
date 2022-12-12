@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     identityType: DataTypes.STRING,
     identityNumber: DataTypes.STRING,
     age: DataTypes.STRING,
-    additionalBaggage: DataTypes.INTEGER
+    baggage: DataTypes.ARRAY(DataTypes.INTEGER)
   }, {
     sequelize,
     modelName: 'Passenger',

@@ -24,8 +24,8 @@ module.exports = {
       age: {
         type: Sequelize.STRING
       },
-      additionalBaggage: {
-        type: Sequelize.INTEGER
+      baggage: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER)
       },
       createdAt: {
         allowNull: false,
