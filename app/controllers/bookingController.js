@@ -58,21 +58,11 @@ const handleBookFlight = async (req, res) => {
     });
 
     const passengerQty = passenger.length;
-    let totalPassengerBaggagePrice = 0;
-    for (let i = 0; i < passengerQty; i++) {
-      if (
-        typeof passengerBaggages[i][1] === 'undefined'
-        && typeof flightPrice[1] === 'undefined'
-      ) {
-        totalPassengerBaggagePrice
-          += passengerBaggages[i] * flightPrice[0];
-      } else {
-        for (let j = 0; j < passengerQty; j++) {
-          totalPassengerBaggagePrice
-            += passengerBaggages[i][j] * flightPrice[i];
-        }
-      }
-    }
+    const totalPassengerBaggagePrice = countBaggagePrice(
+      passengerBaggages,
+      flightPrice,
+      passengerQty,
+    );
 
     const totalPrice = flightPrice.map((e) => e * passengerQty).reduce((a, b) => a + b)
       + totalPassengerBaggagePrice;
@@ -87,7 +77,7 @@ const handleBookFlight = async (req, res) => {
       bookingStatusId: 1,
       passengerQty,
       totalPassengerBaggagePrice:
-      totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
+        totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
       totalPrice,
     });
     const passengerBookingData = passenger.map((e) => ({
@@ -191,6 +181,23 @@ const baggageMultiplier = (baggage) => {
     }
   }
   let result = multiplier[1] / 100;
+  return result;
+};
+
+const countBaggagePrice = (passengerBaggages, flightPrice, passengerQty) => {
+  let result = 0;
+  for (let i = 0; i < passengerQty; i++) {
+    if (
+      typeof passengerBaggages[i][1] === 'undefined'
+      && typeof flightPrice[1] === 'undefined'
+    ) {
+      result += passengerBaggages[i] * flightPrice[0];
+    } else {
+      for (let j = 0; j < passengerQty; j++) {
+        result += passengerBaggages[i][j] * flightPrice[i];
+      }
+    }
+  }
   return result;
 };
 
