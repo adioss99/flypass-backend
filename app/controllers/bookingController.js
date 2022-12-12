@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const {
   Passenger,
   Booking,
-  BookingStatus,
   PassengerContact,
   PassengerBooking,
   Flight,
