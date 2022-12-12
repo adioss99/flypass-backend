@@ -13,7 +13,6 @@ const {
   airportController,
   bookingController,
   whistlistController,
-  transactionmethodController,
   transaction,
 } = require('../controllers');
 
@@ -31,7 +30,6 @@ router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 
 router.post('/v1/pay/create', uploadOnMemory.single('image'), transaction.transactionHandle);
-router.post('/v1/Payment/insert', uploadOnMemory.single('image'), transactionmethodController.savePayment);
 router.put('/v1/pay/updatepay/:id', uploadOnMemory.single('image'), transaction.handlepayment);
 
 // >>>>>>>>>>>
@@ -83,10 +81,6 @@ router.delete('/v1/bookings')
 router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
 router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
 router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
-
-// transactionmethod
-router.get('/v1/payment/findall', authorize, isAdmin, transactionmethodController.getallPayment);
-router.delete('/v1/payment/:id', authorize, isAdmin, transactionmethodController.deletePayment);
 
 // transcation
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
