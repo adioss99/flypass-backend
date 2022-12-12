@@ -65,11 +65,11 @@ const handleBookFlight = async (req, res) => {
         && typeof flightPrice[1] === 'undefined'
       ) {
         totalPassengerBaggagePrice
-          += passengerBaggages[i] * (flightPrice[0] / 100);
+          += passengerBaggages[i] * flightPrice[0];
       } else {
         for (let j = 0; j < passengerQty; j++) {
           totalPassengerBaggagePrice
-            += passengerBaggages[i][j] * (flightPrice[i] / 100);
+            += passengerBaggages[i][j] * flightPrice[i];
         }
       }
     }
@@ -190,7 +190,7 @@ const baggageMultiplier = (baggage) => {
       multiplier[1] += 5;
     }
   }
-  let result = multiplier[1];
+  let result = multiplier[1] / 100;
   return result;
 };
 
