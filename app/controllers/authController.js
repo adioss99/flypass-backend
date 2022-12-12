@@ -36,6 +36,84 @@ function createToken(payload) {
   return [access, refresh]
 }
 
+const handleGoogleAuthUrl = async (req, res) => {
+  const scopes = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
+  ];
+  try {
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: scopes,
+      prompt: 'consent',
+    });
+    res.status(200).json(url);
+  } catch (err) {
+    res.status(401).json({ error: { name: err.name, message: err.message } });
+  }
+};
+
+const handleGoogleAuthCb = async (req, res) => {
+  const data = req.query;
+  try {
+    const { tokens } = await oauth2Client.getToken(data.code);
+    oauth2Client.credentials = tokens;
+    console.log(tokens)
+    const options = {
+      headers: {
+        Authorization: `Bearer ${oauth2Client.credentials.access_token}`,
+      },
+    };
+    const response = await axios.get(
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      options,
+    );
+    const {
+      id, email, name, picture,
+    } = response.data;
+    const [user] = await User.findOrCreate({
+      where: { googleId: id },
+      defaults: {
+        name,
+        email,
+        image: picture,
+        roleId: 1,
+      },
+    });
+    const accessToken = createToken({ user });
+    const accesstToken = accessToken[0];
+    const refreshToken = accessToken[1];
+
+    await User.update(
+      { refreshToken },
+      {
+        where: {
+          id: user.id,
+        },
+      },
+    );
+    res
+      .cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        message: 'login success',
+        user: {
+          id: user.id,
+          email: user.email,
+          accesstToken,
+        },
+      });
+  } catch (err) {
+    res
+      .status(401)
+      .json({ error: { err, name: err.name, message: err.message } });
+  }
+};
+
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
   const { name, password, confirmationPassword } = req.body;
