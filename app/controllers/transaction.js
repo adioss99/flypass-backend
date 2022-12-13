@@ -1,54 +1,34 @@
 // getall transaction
 // konfirmasi (acc,reject)
 
-const { Transaction, Transactionmethod } = require('../../models');
-const { inc } = require('./transactionmethodController');
+const { Transaction } = require('../../models');
+const cloudinary = require('../utils/cloudinary');
 
-const trtAttr = ['name', 'accountNumber'];
+// const method = ['name', 'accountNumber', 'image', 'imageId']
 
-const updateTransaction = async (req, res) => {
-  try {
-    const bookingId = req.booking.id;
-    const {
-      ispayed,
-    } = req.body;
-
-    await Transaction.update(
-      {
-        ispayed,
-      },
-      { where: { id: bookingId } },
-    );
-
-    res.status(200).json({
-      message: ' updated successfully',
-      bookingId,
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: 'error',
-    });
-  }
+const imageUploader = async (req, res, fileBase64) => {
+  const file = `data:${req.file.mimetype};base64,${fileBase64}`;
+  const imgCloud = await cloudinary.uploader.upload(file, {
+    folder: 'Transaction',
+  });
+  const image = imgCloud.url;
+  const imageId = imgCloud.public_id;
+  return [image, imageId];
 };
 
-const getalltranscation = async (req, res) => {
+const transactionHandle = async (req, res) => {
   try {
-    const bookingId = req.booking.id;
-    const pay = await Transaction.findAll({
-      include: [
-        {
-          model: Transactionmethod,
-          attributes: trtAttr,
-          include: inc,
-        },
-      ],
-      where: { bookingId },
+    const fileBase64 = req.file.buffer.toString('base64');
+    const img = await imageUploader(req, res, fileBase64);
+    const { bookingId, TransactionMethodId } = req.body;
+    const transaction = await Transaction.create({
+      bookingId,
+      TransactionMethodId,
+      datePayed: new Date(),
+      isPayed: false,
+      Image: img[0],
     });
-    const data = [];
-    pay.forEach((element) => {
-      data.push(element.Transactionmethod);
-    });
-    res.status(201).json({ pay });
+    res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -58,7 +38,95 @@ const getalltranscation = async (req, res) => {
     });
   }
 }
-module.exports = {
-  getalltranscation,
-  updateTransaction,
+
+const gettranscationId = async (req, res) => {
+  try {
+    // const { transactionId } = req.params.id;
+    const transaction = await Transaction.findByPk(
+      req.params.id,
+    );
+    res.status(201).json({ transaction });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
 }
+
+const handlepayment = async (req, res) => {
+  try {
+    const fileBase64 = req.file.buffer.toString('base64');
+    const img = await imageUploader(req, res, fileBase64);
+    // const { transactionid } = req.body;
+    const transaction = await Transaction.findByPk(req.params.id)
+    // eslint-disable-next-line no-unused-expressions
+    await transaction.update({
+      Image: img[0],
+      // isPayed: true,
+      datePayed: new Date(),
+    // eslint-disable-next-line no-sequences
+    }),
+    res.status(201).json({ message: 'updated successfully', transaction });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
+const handleConfirmPayment = async (req, res) => {
+  try {
+    // const { transactionId } = req.params.id
+    const transaction = await Transaction.findByPk(req.params.id)
+    await transaction.update({
+      isPayed: true,
+    })
+    res.status(201).json(
+      {
+        transaction,
+        message: 'Payment Success',
+      },
+    )
+  } catch (err) {
+    res.status(422).json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+const handleRejectPayment = async (req, res) => {
+  try {
+    // const { transactionId } = req.body
+    const transaction = await Transaction.findByPk(req.params.id)
+    await transaction.update({
+      isPayed: false,
+    })
+    res.status(201).json({
+      transaction,
+      message: 'Payment fail ',
+    })
+  } catch (err) {
+    res.status(422).json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+
+module.exports = {
+  handlepayment,
+  gettranscationId,
+  handleConfirmPayment,
+  handleRejectPayment,
+  transactionHandle,
+};
