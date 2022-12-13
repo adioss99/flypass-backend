@@ -9,6 +9,11 @@ const addWhistlist = async (req, res) => {
   try {
     const userId = req.user.id;
     const flightId = req.params.idflight;
+    const check = await Whistlist.findOne({ where: { flightId, userId } });
+    if (check) {
+      res.status(401).json({ message: 'already in wishlist' });
+      return;
+    }
     const whistlist = await Whistlist.create({ flightId, userId });
     res.status(201).json({ whistlist });
   } catch (err) {
