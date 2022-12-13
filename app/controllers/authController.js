@@ -1,10 +1,20 @@
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
+const { google } = require('googleapis');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const { User } = require('../../models');
 
 const SALT = 10;
+
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL } = process.env;
+
+const oauth2Client = new google.auth.OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL,
+);
 
 function encryptPassword(password) {
   return new Promise((resolve, reject) => {
@@ -31,9 +41,13 @@ function checkPassword(encryptedPassword, password) {
 }
 
 function createToken(payload) {
-  const access = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '6h' });
-  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
-  return [access, refresh]
+  const access = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '6h',
+  });
+  const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: '7d',
+  });
+  return [access, refresh];
 }
 
 const handleGoogleAuthUrl = async (req, res) => {
@@ -59,7 +73,6 @@ const handleGoogleAuthCb = async (req, res) => {
   try {
     const { tokens } = await oauth2Client.getToken(data.code);
     oauth2Client.credentials = tokens;
-    console.log(tokens)
     const options = {
       headers: {
         Authorization: `Bearer ${oauth2Client.credentials.access_token}`,
@@ -78,7 +91,7 @@ const handleGoogleAuthCb = async (req, res) => {
         name,
         email,
         image: picture,
-        roleId: 1,
+        roleId: 2,
       },
     });
     const accessToken = createToken({ user });
@@ -116,10 +129,12 @@ const handleGoogleAuthCb = async (req, res) => {
 
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
-  const { name, password, confirmationPassword } = req.body;
+  const {
+    name, password, confirmationPassword, birthDate, gender, phone,
+  } = req.body;
   const role = roles !== 1 ? 2 : 1;
   if (password !== confirmationPassword) {
-    res.status(401).json({ message: 'password doesn`t match' })
+    res.status(401).json({ message: 'password doesn`t match' });
     return;
   }
   const encryptedPassword = await encryptPassword(password);
@@ -128,16 +143,18 @@ const register = async (req, res, roles) => {
     name,
     email,
     encryptedPassword,
+    birthDate: new Date(birthDate).toISOString(),
+    gender,
+    phone,
     roleId: role,
   });
-
   res.status(201).json({
     message: 'register success',
   });
 };
 
 const registerAdmin = async (req, res) => {
-  register(req, res, 1)
+  register(req, res, 1);
 };
 
 const login = async (req, res) => {
@@ -165,7 +182,12 @@ const login = async (req, res) => {
 
   const token = createToken({
     id: user.id,
+    name: user.name,
+    image: user.image,
     email: user.email,
+    birthDate: user.birthDate,
+    gender: user.gender,
+    phone: user.phone,
     roleId: user.roleId,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
@@ -200,9 +222,11 @@ const whoAmI = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    const refreshToken = req.body.refreshToken === undefined || req.body.refreshToken === null ? req.cookies.refreshToken : req.body.refreshToken;
+    const refreshToken = req.body.refreshToken === undefined || req.body.refreshToken === null
+      ? req.cookies.refreshToken
+      : req.body.refreshToken;
     if (!refreshToken) {
-      res.status(204).send('null')
+      res.status(204).send('null');
       return;
     }
     const user = await User.findAll({
@@ -211,7 +235,7 @@ const logout = async (req, res) => {
       },
     });
     if (!user[0]) {
-      res.status(204).send('notfound')
+      res.status(204).send('notfound');
       return;
     }
     const userId = user[0].id;
@@ -244,7 +268,7 @@ const refreshToken = async (req, res) => {
     });
     if (!user) {
       res.sendStatus(403);
-      return
+      return;
     }
     jwt.verify(refresh, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
       if (err) {
@@ -255,11 +279,24 @@ const refreshToken = async (req, res) => {
       const {
         email, createdAt, updatedAt, roleId,
       } = user;
-      const accessToken = jwt.sign({
-        userId, email, roleId, createdAt, updatedAt,
-      }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '6h',
-      });
+      const accessToken = jwt.sign(
+        {
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          email: user.email,
+          birthDate: user.birthDate,
+          gender: user.gender,
+          phone: user.phone,
+          roleId: user.roleId,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: '6h',
+        },
+      );
       res.json({
         userId,
         email,
@@ -277,6 +314,8 @@ const refreshToken = async (req, res) => {
 };
 
 module.exports = {
+  handleGoogleAuthUrl,
+  handleGoogleAuthCb,
   register,
   registerAdmin,
   login,
