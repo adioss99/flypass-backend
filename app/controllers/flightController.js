@@ -235,4 +235,5 @@ module.exports = {
   handleUpdateFlight,
   handleDeleteFlight,
   inc,
+  flightAttr,
 };
