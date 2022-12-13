@@ -1,4 +1,7 @@
-const randomstring = require('randomstring');
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-plusplus */
+const randomstring = require('randomstring')
 const jwt = require('jsonwebtoken');
 const {
   Passenger,
