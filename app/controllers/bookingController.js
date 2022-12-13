@@ -11,6 +11,7 @@ const {
   PassengerBooking,
   Flight,
 } = require('../../models');
+const { createNotification } = require('./notificationController');
 
 const decodeToken = (token) => jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
@@ -93,12 +94,13 @@ const handleBookFlight = async (req, res) => {
       flight2Id,
       passengerQty,
     );
+    const userId = user != null ? user.id : user;
     const booking = await Booking.create({
       bookingCode: randomstring.generate({ length: 10, charset: 'alphabetic' }),
       flight1Id,
       flight2Id,
       roundtrip: flight2Id != null,
-      userId: user != null ? user.id : user,
+      userId,
       passengerContactId: passengerContact.id,
       bookingStatusId: 1,
       passengerQty,
@@ -111,6 +113,9 @@ const handleBookFlight = async (req, res) => {
     const passengerBooking = await PassengerBooking.bulkCreate(
       passengerBookingData,
     );
+    if (userId) {
+      createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
+    }
     res.status(200).json({
       booking, passengerContact, passenger, passengerBooking,
     });
