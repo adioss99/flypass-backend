@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "db:create": "sequelize db:create",
     "db:drop": "sequelize db:drop",
-    "db:migrate": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate",
+    "db:migrate": "npx sequelize-cli db:migrate",
     "db:seed": "npx sequelize-cli db:seed:undo:all && npx sequelize-cli db:seed:all",
     "lint": "eslint .",
     "lint:fix": "eslint --fix"
@@ -39,7 +39,8 @@
     "pg-hstore": "^2.3.4",
     "querystring": "^0.2.1",
     "randomstring": "^1.2.3",
-    "sequelize": "^6.25.7"
+    "sequelize": "^6.25.7",
+    "socket.io": "^4.5.4"
   },
   "devDependencies": {
     "eslint": "^8.28.0",

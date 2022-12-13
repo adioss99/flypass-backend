@@ -10,19 +10,7 @@ const {
   PassengerBooking,
   Flight,
 } = require('../../models');
-
-const decodeToken = (token) => jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-const userToken = (req) => {
-  try {
-    const token = req.headers.authorization?.split('Bearer ')[1];
-    const payload = decodeToken(token);
-    return payload;
-  } catch (error) {
-    const payload = null;
-    return payload;
-  }
-};
+const { createNotification } = require('./notificationController');
 
 const countTotalPrice = async (flight1, flight2, qty) => {
   const Flight1 = await Flight.findByPk(flight1);
@@ -87,12 +75,13 @@ const handleBookFlight = async (req, res) => {
     const totalPrice = flightPrice.map((e) => e * passengerQty).reduce((a, b) => a + b)
       + totalPassengerBaggagePrice;
 
+    const userId = user !== null ? user.id : user;
     const booking = await Booking.create({
       bookingCode: randomstring.generate({ length: 10, charset: 'alphabetic' }),
       flight1Id,
       flight2Id,
       roundtrip: flight2Id != null,
-      userId: user !== null ? user.id : user,
+      userId,
       passengerContactId: passengerContact.id,
       bookingStatusId: 1,
       passengerQty,
@@ -107,6 +96,9 @@ const handleBookFlight = async (req, res) => {
     const passengerBooking = await PassengerBooking.bulkCreate(
       passengerBookingData,
     );
+    if (userId) {
+      createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
+    }
     res.status(200).json({
       booking,
       passengerContact,

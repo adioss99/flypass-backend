@@ -14,6 +14,7 @@ const {
   bookingController,
   whistlistController,
   transaction,
+  notificationController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -88,6 +89,11 @@ router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWh
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
+
+// nptification (not done yet)
+router.get('/v1/notification/admin', notificationController.getNotificationAdmin);
+router.get('/v1/notification', notificationController.getNotificationUser);
+router.put('/v1/notification/:id', notificationController.updateNotification)
 
 router.use(authController.onLost);
 router.use(authController.onError);
