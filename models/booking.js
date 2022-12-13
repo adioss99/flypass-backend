@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Booking extends Model {
     /**
@@ -21,7 +19,6 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Flight,{
         foreignKey: 'flight2Id',
         as: 'flight2'
-
       })
       this.belongsTo(models.User,{
         foreignKey: 'userId'
@@ -43,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     passengerContactId: DataTypes.INTEGER,
     bookingStatusId: DataTypes.INTEGER,
     passengerQty: DataTypes.INTEGER,
+    totalPassengerBaggagePrice: DataTypes.INTEGER,
     totalPrice: DataTypes.DOUBLE
   }, {
     sequelize,

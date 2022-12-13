@@ -91,7 +91,7 @@ const handleGoogleAuthCb = async (req, res) => {
         name,
         email,
         image: picture,
-        roleId: 1,
+        roleId: 2,
       },
     });
     const accessToken = createToken({ user });
