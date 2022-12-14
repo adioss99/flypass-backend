@@ -18,7 +18,7 @@ const {
 const { createNotification } = require('./notificationController');
 const { flightInc, flightAttr } = require('./flightController'); // error kalo 2-2nya include pake import
 
-const bookInc = [
+const flight2Inc = [
   {
     model: Airline,
   },
@@ -48,25 +48,33 @@ const countTotalPrice = async (flight1, flight2, qty) => {
   return result;
 };
 
+const bookingInc = [
+  {
+    model: Flight,
+    as: 'flight1',
+    attributes: flightAttr,
+    include: flightInc, // kalo pake variable yang sama error
+  },
+  {
+    model: Flight,
+    as: 'flight2',
+    attributes: flightAttr,
+    include: flight2Inc, // kalo pake variable yang sama error
+  },
+  {
+    model: Passenger,
+    through: {
+      attributes: [],
+    },
+  },
+]
+
 const handleListBookings = async (req, res) => {
   try {
     const booking = await Booking.findAll({
-      include: [
-        {
-          model: Flight,
-          as: 'flight1',
-          attributes: flightAttr,
-          include: bookInc, // kalo pake variable yang sama error
-        },
-        {
-          model: Flight,
-          as: 'flight2',
-          attributes: flightAttr,
-          include: flightInc, // kalo pake variable yang sama error
-        },
-      ],
+      include: bookingInc,
     });
-    res.status(200).json({ booking, flightInc });
+    res.status(200).json({ booking });
   } catch (err) {
     res.status(404).json({
       error: {
@@ -168,20 +176,7 @@ const handleSearchBookingByCode = async (req, res) => {
       where: {
         bookingCode: req.query.bookingcode,
       },
-      include: [
-        {
-          model: Flight,
-          as: 'flight1',
-          attributes: flightAttr,
-          include: bookInc, // kalo pake variable yang sama error
-        },
-        {
-          model: Flight,
-          as: 'flight2',
-          attributes: flightAttr,
-          include: flightInc, // kalo pake variable yang sama error
-        },
-      ],
+      include: bookingInc,
     });
     res.status(200).json({ booking });
   } catch (err) {
@@ -202,7 +197,7 @@ const handleGetUserBooking = async (req, res) => {
         where: {
           userId: user.id,
         },
-        include: { all: true, nested: true },
+        include: bookingInc,
       });
       res.status(200).json({ booking });
     } else {
