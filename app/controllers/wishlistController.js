@@ -1,20 +1,20 @@
 const {
-  Whistlist, Flight,
+  Wishlist, Flight,
 } = require('../../models');
-const { inc } = require('./flightController');
+const { flightInc } = require('./flightController');
 
 const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
 
-const addWhistlist = async (req, res) => {
+const addWishlist = async (req, res) => {
   try {
     const userId = req.user.id;
     const flightId = req.params.idflight;
-    const check = await Whistlist.findOne({ where: { flightId, userId } });
+    const check = await Wishlist.findOne({ where: { flightId, userId } });
     if (check) {
       res.status(401).json({ message: 'already in wishlist' });
       return;
     }
-    const whistlist = await Whistlist.create({ flightId, userId });
+    const whistlist = await Wishlist.create({ flightId, userId });
     res.status(201).json({ whistlist });
   } catch (err) {
     res.status(422).json({
@@ -26,15 +26,15 @@ const addWhistlist = async (req, res) => {
   }
 };
 
-const getWhistlist = async (req, res) => {
+const getWishlist = async (req, res) => {
   try {
     const userId = req.user.id;
-    const whist = await Whistlist.findAll({
+    const whist = await Wishlist.findAll({
       include: [
         {
           model: Flight,
           attributes: flightAttr,
-          include: inc,
+          include: flightInc,
         },
       ],
       where: { userId },
@@ -43,8 +43,8 @@ const getWhistlist = async (req, res) => {
     whist.forEach((element) => {
       data.push(element.Flight);
     });
-    const whistlist = data.length === 0 ? null : data;
-    res.status(200).json({ whistlist });
+    const wishlist = data.length === 0 ? null : data;
+    res.status(200).json({ wishlist });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -55,11 +55,11 @@ const getWhistlist = async (req, res) => {
   }
 };
 
-const deleteWhistlist = async (req, res) => {
+const deleteWishlist = async (req, res) => {
   try {
     const flightId = req.params.idflight;
     const userId = req.user.id;
-    const del = await Whistlist.destroy({ where: { flightId, userId } });
+    const del = await Wishlist.destroy({ where: { flightId, userId } });
     res.status(201).json({ del });
   } catch (err) {
     res.status(422).json({
@@ -72,7 +72,7 @@ const deleteWhistlist = async (req, res) => {
 };
 
 module.exports = {
-  addWhistlist,
-  getWhistlist,
-  deleteWhistlist,
+  addWishlist,
+  getWishlist,
+  deleteWishlist,
 };
