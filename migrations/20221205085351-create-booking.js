@@ -58,9 +58,6 @@ module.exports = {
       passengerQty: {
         type: Sequelize.INTEGER,
       },
-      totalPassengerBaggagePrice: {
-        type: Sequelize.INTEGER,
-      },
       totalPrice: {
         type: Sequelize.DOUBLE
       },
