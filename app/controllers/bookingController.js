@@ -9,8 +9,37 @@ const {
   PassengerContact,
   PassengerBooking,
   Flight,
+  Airline,
+  Airplane,
+  FlightClass,
+  FlightType,
+  Airport,
 } = require('../../models');
 const { createNotification } = require('./notificationController');
+const { flightInc, flightAttr } = require('./flightController'); // error kalo 2-2nya include pake import
+
+const bookInc = [
+  {
+    model: Airline,
+  },
+  {
+    model: Airplane,
+  },
+  {
+    model: FlightClass,
+  },
+  {
+    model: FlightType,
+  },
+  {
+    model: Airport,
+    as: 'departureAirport',
+  },
+  {
+    model: Airport,
+    as: 'arrivalAirport',
+  },
+];
 
 const countTotalPrice = async (flight1, flight2, qty) => {
   const Flight1 = await Flight.findByPk(flight1);
@@ -22,9 +51,22 @@ const countTotalPrice = async (flight1, flight2, qty) => {
 const handleListBookings = async (req, res) => {
   try {
     const booking = await Booking.findAll({
-      include: { all: true, nested: true },
+      include: [
+        {
+          model: Flight,
+          as: 'flight1',
+          attributes: flightAttr,
+          include: bookInc, // kalo pake variable yang sama error
+        },
+        {
+          model: Flight,
+          as: 'flight2',
+          attributes: flightAttr,
+          include: flightInc, // kalo pake variable yang sama error
+        },
+      ],
     });
-    res.status(200).json({ booking });
+    res.status(200).json({ booking, flightInc });
   } catch (err) {
     res.status(404).json({
       error: {
@@ -47,15 +89,6 @@ const handleBookFlight = async (req, res) => {
       flight1Id,
       flight2Id,
     } = req.body;
-    const flightPrice = await Promise.all(
-      [flight1Id, flight2Id].filter((e) => e !== undefined).map(getPrice),
-    );
-    const passengerData = req.body.passenger;
-    const passenger = await Passenger.bulkCreate(passengerData);
-    const passengerBaggages = passenger
-      .map((passengers) => passengers.baggage)
-      .filter((baggages) => baggages !== null)
-      .map((baggage) => baggage.map(baggageMultiplier));
 
     const passengerContact = await PassengerContact.create({
       title: contactTitle,
@@ -64,6 +97,17 @@ const handleBookFlight = async (req, res) => {
       phone: contactPhone,
       email: contactEmail,
     });
+
+    const passengerData = req.body.passenger;
+    const passenger = await Passenger.bulkCreate(passengerData);
+    const passengerBaggages = passenger
+      .map((passengers) => passengers.baggage)
+      .filter((baggages) => baggages !== null)
+      .map((baggage) => baggage.map(baggageMultiplier));
+
+    const flightPrice = await Promise.all(
+      [flight1Id, flight2Id].filter((e) => e !== undefined).map(getPrice),
+    );
 
     const passengerQty = passenger.length;
     const totalPassengerBaggagePrice = countBaggagePrice(
@@ -89,13 +133,16 @@ const handleBookFlight = async (req, res) => {
         totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
       totalPrice,
     });
+
     const passengerBookingData = passenger.map((e) => ({
       passengerId: e.id,
       bookingId: booking.id,
     }));
+
     const passengerBooking = await PassengerBooking.bulkCreate(
       passengerBookingData,
     );
+
     if (userId) {
       createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
     }
@@ -121,7 +168,20 @@ const handleSearchBookingByCode = async (req, res) => {
       where: {
         bookingCode: req.query.bookingcode,
       },
-      include: { all: true, nested: true },
+      include: [
+        {
+          model: Flight,
+          as: 'flight1',
+          attributes: flightAttr,
+          include: bookInc, // kalo pake variable yang sama error
+        },
+        {
+          model: Flight,
+          as: 'flight2',
+          attributes: flightAttr,
+          include: flightInc, // kalo pake variable yang sama error
+        },
+      ],
     });
     res.status(200).json({ booking });
   } catch (err) {

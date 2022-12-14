@@ -12,7 +12,7 @@ const {
   airplaneController,
   airportController,
   bookingController,
-  whistlistController,
+  wishlistController,
   transaction,
   notificationController,
 } = require('../controllers');
@@ -80,10 +80,10 @@ router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
 router.delete('/v1/bookings')
 
-// whistlist
-router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
-router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
-router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
+// wishlist
+router.get('/v1/wishlist', authorize, wishlistController.getWishlist);
+router.post('/v1/wishlist/:idflight', authorize, wishlistController.addWishlist);
+router.delete('/v1/wishlist/:idflight', authorize, wishlistController.deleteWishlist);
 
 // transcation
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
