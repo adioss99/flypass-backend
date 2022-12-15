@@ -30,7 +30,7 @@ const updateProfiles = async (req, res) => {
     }
 
     const profile = await User.findByPk(userId, { attributes: ['image', 'imageId'] });
-    let img = profile.image;
+    let img = profile.Image;
     let imgId = profile.imageId;
 
     if (req.file !== undefined) {
