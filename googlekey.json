@@ -1,0 +1,11 @@
+{
+  "web": {
+    "client_id": "506700439555-39010gk90hbn9k8dn3tj2qstjeasfb0p.apps.googleusercontent.com",
+    "project_id": "flypass-oauth",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "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",
+    "javascript_origins": ["http://localhost:3000"]
+  }
+}
