@@ -12,8 +12,9 @@ const {
   airplaneController,
   airportController,
   bookingController,
-  whistlistController,
+  wishlistController,
   transaction,
+  notificationController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -79,16 +80,21 @@ router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
 router.delete('/v1/bookings')
 
-// whistlist
-router.get('/v1/whistlist', authorize, whistlistController.getWhistlist);
-router.post('/v1/whistlist/:idflight', authorize, whistlistController.addWhistlist);
-router.delete('/v1/whistlist/:idflight', authorize, whistlistController.deleteWhistlist);
+// wishlist
+router.get('/v1/wishlist', authorize, wishlistController.getWishlist);
+router.post('/v1/wishlist/:idflight', authorize, wishlistController.addWishlist);
+router.delete('/v1/wishlist/:idflight', authorize, wishlistController.deleteWishlist);
 
 // transcation
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
 router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction);
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
+
+// nptification (not done yet)
+router.get('/v1/notification/admin', notificationController.getNotificationAdmin);
+router.get('/v1/notification', notificationController.getNotificationUser);
+router.put('/v1/notification/:id', notificationController.updateNotification)
 
 router.use(authController.onLost);
 router.use(authController.onError);

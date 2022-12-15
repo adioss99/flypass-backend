@@ -20,7 +20,7 @@ const isSameCountry = async (departure, arrival) => {
 };
 
 const flightAttr = ['id', 'flightCode', 'departureDate', 'departureTime', 'arrivalDate', 'arrivalTime', 'duration', 'price', 'baggage', 'isAvailable'];
-const inc = [
+const flightInc = [
   {
     model: Airline,
   },
@@ -52,7 +52,7 @@ const handleListFlights = async (req, res) => {
         isAvailable: { [Op.is]: true },
       },
       attributes: flightAttr,
-      include: inc,
+      include: flightInc,
       offset: 0,
       limit: 10,
     });
@@ -66,7 +66,7 @@ const handleGetFlight = async (req, res) => {
   try {
     const flights = await Flight.findByPk(req.params.id, {
       attributes: flightAttr,
-      include: inc,
+      include: flightInc,
     });
     res.status(200).json(flights);
   } catch (err) {
@@ -234,5 +234,6 @@ module.exports = {
   handleCreateFlight,
   handleUpdateFlight,
   handleDeleteFlight,
-  inc,
+  flightInc,
+  flightAttr,
 };

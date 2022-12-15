@@ -30,9 +30,17 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.FlightClass,{
         foreignKey: 'flightClassId'
       })
-      this.hasMany(models.Whistlist, {
+      this.hasMany(models.Wishlist, {
         foreignKey: 'flightId'
       });
+      this.hasMany(models.Booking,{
+        foreignKey: 'flight1Id',
+        as: 'flight1'
+      })
+      this.hasMany(models.Booking,{
+        foreignKey: 'flight2Id',
+        as: 'flight2'
+      })
     }
   }
   Flight.init(
