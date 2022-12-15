@@ -67,6 +67,9 @@ const bookingInc = [
       attributes: [],
     },
   },
+  {
+    model: PassengerContact,
+  },
 ]
 
 const handleListBookings = async (req, res) => {
