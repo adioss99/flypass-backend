@@ -14,6 +14,7 @@ const {
   FlightClass,
   FlightType,
   Airport,
+  BookingStatus,
 } = require('../../models');
 const { createNotification } = require('./notificationController');
 const { flightInc, flightAttr } = require('./flightController'); // error kalo 2-2nya include pake import
@@ -70,6 +71,9 @@ const bookingInc = [
   {
     model: PassengerContact,
   },
+  {
+    model: BookingStatus,
+  }
 ]
 
 const handleListBookings = async (req, res) => {
