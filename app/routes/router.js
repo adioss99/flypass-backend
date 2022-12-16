@@ -87,6 +87,7 @@ router.delete('/v1/wishlist/:idflight', authorize, wishlistController.deleteWish
 
 // transcation
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
+router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction);
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
 
