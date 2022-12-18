@@ -1,10 +1,5 @@
-// getall transaction
-// konfirmasi (acc,reject)
-
-const { Transaction } = require('../../models');
+const { Transaction, Booking } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
-
-// const method = ['name', 'accountNumber', 'image', 'imageId']
 
 const imageUploader = async (req, res, fileBase64) => {
   const file = `data:${req.file.mimetype};base64,${fileBase64}`;
@@ -27,7 +22,28 @@ const transactionHandle = async (req, res) => {
       datePayed: new Date(),
       isPayed: false,
       Image: img[0],
+      ImageId: img[1],
     });
+    await Booking.update(
+      { bookingStatusId: 2 },
+      {
+        where: { id: transaction.bookingId },
+      },
+    );
+    res.status(201).json({ message: 'created successfully', transaction });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const getalltransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findAll();
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
@@ -37,14 +53,11 @@ const transactionHandle = async (req, res) => {
       },
     });
   }
-}
+};
 
 const gettranscationId = async (req, res) => {
   try {
-    // const { transactionId } = req.params.id;
-    const transaction = await Transaction.findByPk(
-      req.params.id,
-    );
+    const transaction = await Transaction.findByPk(req.params.id);
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
@@ -54,22 +67,23 @@ const gettranscationId = async (req, res) => {
       },
     });
   }
-}
+};
 
 const handlepayment = async (req, res) => {
   try {
+    const transaction = await Transaction.findByPk(req.params.id);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    // const { transactionid } = req.body;
-    const transaction = await Transaction.findByPk(req.params.id)
     // eslint-disable-next-line no-unused-expressions
     await transaction.update({
       Image: img[0],
-      // isPayed: true,
+      imageId: img[1],
       datePayed: new Date(),
-    // eslint-disable-next-line no-sequences
+      // eslint-disable-next-line no-sequences
     }),
-    res.status(201).json({ message: 'updated successfully', transaction });
+    res
+      .status(201)
+      .json({ message: 'updated successfully', transaction });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -78,54 +92,65 @@ const handlepayment = async (req, res) => {
       },
     });
   }
-}
+};
 
 const handleConfirmPayment = async (req, res) => {
   try {
-    // const { transactionId } = req.params.id
-    const transaction = await Transaction.findByPk(req.params.id)
+    const transaction = await Transaction.findByPk(req.params.id);
     await transaction.update({
       isPayed: true,
-    })
-    res.status(201).json(
+    });
+
+    await Booking.update(
+      { bookingStatusId: 3 },
       {
-        transaction,
-        message: 'Payment Success',
+        where: { id: transaction.bookingId },
       },
-    )
+    );
+    res.status(201).json({
+      transaction,
+      message: 'Payment Success',
+    });
   } catch (err) {
     res.status(422).json({
       err: {
         name: err.name,
         message: err.message,
       },
-    })
+    });
   }
-}
+};
 const handleRejectPayment = async (req, res) => {
   try {
-    // const { transactionId } = req.body
-    const transaction = await Transaction.findByPk(req.params.id)
+    const transaction = await Transaction.findByPk(req.params.id);
     await transaction.update({
       isPayed: false,
-    })
+    });
+
+    await Booking.update(
+      { bookingStatusId: 4 },
+      {
+        where: { id: transaction.bookingId },
+      },
+    );
     res.status(201).json({
       transaction,
       message: 'Payment fail ',
-    })
+    });
   } catch (err) {
     res.status(422).json({
       err: {
         name: err.name,
         message: err.message,
       },
-    })
+    });
   }
-}
+};
 
 module.exports = {
   handlepayment,
   gettranscationId,
+  getalltransaction,
   handleConfirmPayment,
   handleRejectPayment,
   transactionHandle,
