@@ -53,8 +53,6 @@ const handleListFlights = async (req, res) => {
       },
       attributes: flightAttr,
       include: flightInc,
-      offset: 0,
-      limit: 10,
     });
     res.status(200).json({ flights });
   } catch (err) {

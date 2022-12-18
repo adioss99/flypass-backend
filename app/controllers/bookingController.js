@@ -14,6 +14,7 @@ const {
   FlightClass,
   FlightType,
   Airport,
+  BookingStatus,
 } = require('../../models');
 const { createNotification } = require('./notificationController');
 const { flightInc, flightAttr } = require('./flightController'); // error kalo 2-2nya include pake import
@@ -53,19 +54,25 @@ const bookingInc = [
     model: Flight,
     as: 'flight1',
     attributes: flightAttr,
-    include: flightInc, // kalo pake variable yang sama error
+    include: flightInc,
   },
   {
     model: Flight,
     as: 'flight2',
     attributes: flightAttr,
-    include: flight2Inc, // kalo pake variable yang sama error
+    include: flight2Inc,
   },
   {
     model: Passenger,
     through: {
       attributes: [],
     },
+  },
+  {
+    model: PassengerContact,
+  },
+  {
+    model: BookingStatus,
   },
 ]
 
