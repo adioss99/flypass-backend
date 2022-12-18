@@ -96,7 +96,6 @@ router.get('/v1/notification/admin', authorize, isAdmin, notificationController.
 router.get('/v1/notification', authorize, notificationController.getNotificationUser);
 router.put('/v1/notification/:id', authorize, notificationController.updateNotification);
 router.delete('/v1/notification/:id', authorize, notificationController.deleteNotification);
-router.get('/v1/notification/:id', notificationController.getNotificationUser); // uji coba ====
 
 router.use(authController.onLost);
 router.use(authController.onError);
