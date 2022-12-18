@@ -152,7 +152,7 @@ const handleBookFlight = async (req, res) => {
     );
 
     if (userId) {
-      createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
+      await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
     res.status(200).json({
       booking,

@@ -1,13 +1,22 @@
 const { Notification } = require('../../models');
-// const notif = require('../utils/socket');
-const getNotification = async (isAdmin) => {
-  const notification = await Notification.findAll({ where: { admin: isAdmin } }, { order: [['createdAt', 'ASC']] });
-  const count = await Notification.count({ where: { admin: isAdmin, isRead: false } }, { order: [['createdAt', 'ASC']] });
-  return [count, notification];
+
+const getNotification = async (props) => {
+  const notification = await Notification.findAll({
+    where: props,
+    order: [['createdAt', 'DESC']],
+  });
+  return notification;
 };
 
+const countNewNotification = async (props) => {
+  const count = await Notification.count({
+    where: props,
+  });
+  return count
+}
+
 const createNotification = async (message, bookingCode, bookingId, isAdmin, userId) => {
-  await Notification.create({
+  const newNotif = await Notification.create({
     message,
     bookingCode,
     bookingId,
@@ -15,6 +24,12 @@ const createNotification = async (message, bookingCode, bookingId, isAdmin, user
     admin: isAdmin,
     userId,
   });
+  if (isAdmin) {
+    global.io.to('admin').emit('notif-to-admin', newNotif);
+    return
+  }
+  const room = userId.toString()
+  global.io.to(room).emit('notif-to-user', newNotif);
 };
 
 const updateNotification = async (req, res) => {
@@ -37,10 +52,29 @@ const updateNotification = async (req, res) => {
   }
 };
 
+const deleteNotification = async (req, res) => {
+  try {
+    const uId = req.params.id
+    await Notification.destroy({ where: { id: uId } })
+    res.status(201).json({ message: 'notification deleted' })
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
 const getNotificationUser = async (req, res) => {
   try {
-    const notification = await getNotification(false);
-    res.status(201).json({ newNotification: notification[0], notification: notification[1] });
+    const uId = req.user.id;
+    const notification = await getNotification({ userId: uId, admin: false });
+    const newNotification = await countNewNotification({
+      userId: uId, admin: false, isRead: false,
+    });
+    res.status(200).json({ newNotification, notification });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -53,8 +87,12 @@ const getNotificationUser = async (req, res) => {
 
 const getNotificationAdmin = async (req, res) => {
   try {
-    const notification = await Notification.findAll({ where: { admin: true } }, { order: [['createdAt', 'ASC']] });
-    res.status(201).json({ notification });
+    const notification = await getNotification({ admin: true });
+    const newNotification = await countNewNotification({
+      admin: true,
+      isRead: false,
+    });
+    res.status(200).json({ newNotification, notification });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -70,4 +108,5 @@ module.exports = {
   updateNotification,
   getNotificationUser,
   getNotificationAdmin,
+  deleteNotification,
 };

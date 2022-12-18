@@ -1,10 +1,6 @@
-// getall transaction
-// konfirmasi (acc,reject)
-
 const { Transaction } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
-
-// const method = ['name', 'accountNumber', 'image', 'imageId']
+const { createNotification } = require('./notificationController');
 
 const imageUploader = async (req, res, fileBase64) => {
   const file = `data:${req.file.mimetype};base64,${fileBase64}`;
@@ -28,6 +24,8 @@ const transactionHandle = async (req, res) => {
       isPayed: false,
       Image: img[0],
     });
+
+    await createNotification('Payment need to be verificated', null, bookingId, true, null);
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
