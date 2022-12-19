@@ -1,5 +1,6 @@
 const { Transaction, Booking } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
+const { createNotification } = require('./notificationController');
 
 const imageUploader = async (req, res, fileBase64) => {
   const file = `data:${req.file.mimetype};base64,${fileBase64}`;
@@ -10,6 +11,11 @@ const imageUploader = async (req, res, fileBase64) => {
   const imageId = imgCloud.public_id;
   return [image, imageId];
 };
+
+const findBooking = async (params) => {
+  const book = await Booking.findByPk(params)
+  return book
+}
 
 const transactionHandle = async (req, res) => {
   try {
@@ -30,6 +36,7 @@ const transactionHandle = async (req, res) => {
         where: { id: transaction.bookingId },
       },
     );
+    await createNotification('Payment need to be verificated', null, bookingId, true, null);
     res.status(201).json({ message: 'created successfully', transaction });
   } catch (err) {
     res.status(422).json({
@@ -74,13 +81,11 @@ const handlepayment = async (req, res) => {
     const transaction = await Transaction.findByPk(req.params.id);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    // eslint-disable-next-line no-unused-expressions
     await transaction.update({
       Image: img[0],
       imageId: img[1],
       datePayed: new Date(),
-      // eslint-disable-next-line no-sequences
-    }),
+    })
     res
       .status(201)
       .json({ message: 'updated successfully', transaction });
@@ -107,6 +112,10 @@ const handleConfirmPayment = async (req, res) => {
         where: { id: transaction.bookingId },
       },
     );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment has been verificated', booking.bookingCode, booking.id, false, booking.userId);
+    }
     res.status(201).json({
       transaction,
       message: 'Payment Success',
@@ -126,16 +135,19 @@ const handleRejectPayment = async (req, res) => {
     await transaction.update({
       isPayed: false,
     });
-
     await Booking.update(
       { bookingStatusId: 4 },
       {
         where: { id: transaction.bookingId },
       },
     );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment rejected', booking.bookingCode, booking.id, false, booking.userId);
+    }
     res.status(201).json({
       transaction,
-      message: 'Payment fail ',
+      message: 'Payment fail',
     });
   } catch (err) {
     res.status(422).json({
