@@ -91,7 +91,7 @@ router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
 
-// notification (not done yet)
+// notification
 router.get('/v1/notification/admin', authorize, isAdmin, notificationController.getNotificationAdmin);
 router.get('/v1/notification', authorize, notificationController.getNotificationUser);
 router.put('/v1/notification/:id', authorize, notificationController.updateNotification);
