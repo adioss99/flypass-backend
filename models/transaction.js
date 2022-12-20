@@ -7,18 +7,12 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      this.belongsTo(models.Transactionmethod, {
-        foreignKey: "TransactionMethodId",
-      });
-    }
   }
   Transaction.init(
     {
       bookingId: DataTypes.INTEGER,
       Image: DataTypes.STRING,
       ImageId: DataTypes.STRING,
-      TransactionMethodId: DataTypes.INTEGER,
       isPayed: DataTypes.BOOLEAN,
       datePayed: DataTypes.DATE,
     },
