@@ -13488,7 +13488,7 @@ module.exports = {
         "country": "US"
       },
       {
-        "iata": null,
+        "iata": "EDC",
         "name": "Austin Executive Airport",
         "city": "Austin",
         "country": "US"

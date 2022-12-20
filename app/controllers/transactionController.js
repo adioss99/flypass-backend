@@ -21,10 +21,9 @@ const transactionHandle = async (req, res) => {
   try {
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    const { bookingId, TransactionMethodId } = req.body;
+    const { bookingId } = req.params;
     const transaction = await Transaction.create({
       bookingId,
-      TransactionMethodId,
       datePayed: new Date(),
       isPayed: false,
       Image: img[0],
@@ -37,7 +36,21 @@ const transactionHandle = async (req, res) => {
       },
     );
     await createNotification('Payment need to be verificated', null, bookingId, true, null);
-    res.status(201).json({ message: 'created successfully', transaction });
+    res.status(201).json({ message: 'created successfully', bookingId });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const getBookingTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findAll({ where: { bookingId: req.params.bookingId } });
+    res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -117,8 +130,8 @@ const handleConfirmPayment = async (req, res) => {
       await createNotification('Your payment has been verificated', booking.bookingCode, booking.id, false, booking.userId);
     }
     res.status(201).json({
-      transaction,
       message: 'Payment Success',
+      transaction,
     });
   } catch (err) {
     res.status(422).json({
@@ -129,6 +142,7 @@ const handleConfirmPayment = async (req, res) => {
     });
   }
 };
+
 const handleRejectPayment = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
@@ -146,8 +160,8 @@ const handleRejectPayment = async (req, res) => {
       await createNotification('Your payment rejected', booking.bookingCode, booking.id, false, booking.userId);
     }
     res.status(201).json({
+      message: 'Payment rejected',
       transaction,
-      message: 'Payment fail',
     });
   } catch (err) {
     res.status(422).json({
@@ -162,6 +176,7 @@ const handleRejectPayment = async (req, res) => {
 module.exports = {
   handlepayment,
   gettranscationId,
+  getBookingTransaction,
   getalltransaction,
   handleConfirmPayment,
   handleRejectPayment,
