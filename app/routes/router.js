@@ -29,8 +29,7 @@ router.get('/', getStarted);
 router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
-
-router.post('/v1/pay/create', uploadOnMemory.single('image'), transaction.transactionHandle);
+router.post('/v1/pay/create/:bookingId', uploadOnMemory.single('image'), transaction.transactionHandle);
 router.put('/v1/pay/updatepay/:id', uploadOnMemory.single('image'), transaction.handlepayment);
 
 // >>>>>>>>>>>
@@ -86,6 +85,7 @@ router.post('/v1/wishlist/:idflight', authorize, wishlistController.addWishlist)
 router.delete('/v1/wishlist/:idflight', authorize, wishlistController.deleteWishlist);
 
 // transcation
+router.get('/v1/pay/:bookingId', transaction.getBookingTransaction);
 router.get('/v1/pay/:id', authorize, isAdmin, transaction.gettranscationId);
 router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction);
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
