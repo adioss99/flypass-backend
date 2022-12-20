@@ -1,14 +1,18 @@
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 const { google } = require('googleapis');
+const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { User } = require('../../models');
 
+const { people } = google.people('v1');
 const SALT = 10;
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL } = process.env;
+const {
+  GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, GOOGLE_CLIENT_ID_ANDROID,
+} = process.env;
 
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
@@ -54,6 +58,9 @@ const handleGoogleAuthUrl = async (req, res) => {
   const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/user.birthday.read',
+    'https://www.googleapis.com/auth/user.gender.read',
+    'https://www.googleapis.com/auth/user.phonenumbers.read',
     'openid',
   ];
   try {
@@ -62,7 +69,7 @@ const handleGoogleAuthUrl = async (req, res) => {
       scope: scopes,
       prompt: 'consent',
     });
-    res.status(200).json(url);
+    res.status(200).json(url)
   } catch (err) {
     res.status(401).json({ error: { name: err.name, message: err.message } });
   }
@@ -70,27 +77,40 @@ const handleGoogleAuthUrl = async (req, res) => {
 
 const handleGoogleAuthCb = async (req, res) => {
   const data = req.query;
+  const { tokens } = await oauth2Client.getToken(data.code);
+  oauth2Client.credentials = tokens;
+  res.end('Success')
+}
+
+const verifyIdToken = async (req, res, next) => {
+  const { IdToken } = req.body
   try {
-    const { tokens } = await oauth2Client.getToken(data.code);
-    oauth2Client.credentials = tokens;
-    const options = {
-      headers: {
-        Authorization: `Bearer ${oauth2Client.credentials.access_token}`,
+    const ticket = await oauth2Client.verifyIdToken({
+      idToken: IdToken,
+      audience: [GOOGLE_CLIENT_ID, GOOGLE_CLIENT_ID_ANDROID],
+    })
+    res.payload = ticket.getPayload();
+    next()
+  } catch (err) {
+    res.status(400).json({
+      err: {
+        name: err.name,
+        message: err.message,
       },
-    };
-    const response = await axios.get(
-      'https://www.googleapis.com/oauth2/v2/userinfo',
-      options,
-    );
-    const {
-      id, email, name, picture,
-    } = response.data;
+    })
+  }
+}
+
+const handleLoginRegisterGoogle = async (req, res) => {
+  try {
+    const data = res.payload
+
     const [user] = await User.findOrCreate({
-      where: { googleId: id },
+      where: { googleId: data.sub },
       defaults: {
-        name,
-        email,
-        image: picture,
+        name: data.given_name,
+        email: data.email,
+        image: data.picture,
         roleId: 2,
       },
     });
@@ -125,7 +145,7 @@ const handleGoogleAuthCb = async (req, res) => {
       .status(401)
       .json({ error: { err, name: err.name, message: err.message } });
   }
-};
+}
 
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
@@ -314,8 +334,10 @@ const refreshToken = async (req, res) => {
 };
 
 module.exports = {
+  handleLoginRegisterGoogle,
   handleGoogleAuthUrl,
   handleGoogleAuthCb,
+  verifyIdToken,
   register,
   registerAdmin,
   login,

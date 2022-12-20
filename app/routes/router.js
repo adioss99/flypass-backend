@@ -49,8 +49,9 @@ router.put('/v1/flights/:id', authorize, isAdmin, flightController.handleUpdateF
 router.delete('/v1/flights/:id', authorize, isAdmin, flightController.handleDeleteFlight);
 
 // auth
-router.get('/v1/gsiauth', authController.handleGoogleAuthUrl);
+router.get('/v1/gsiauth', authController.handleGoogleAuthUrl)
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb);
+router.post('/v1/googleidtokenlogin', authController.verifyIdToken, authController.handleLoginRegisterGoogle)
 router.post('/v1/login', authController.login);
 router.post('/v1/register', emailExist, authController.register);
 router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
