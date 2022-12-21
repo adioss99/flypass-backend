@@ -9,6 +9,7 @@
     "db:drop": "sequelize db:drop",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:seed": "npx sequelize-cli db:seed:undo:all && npx sequelize-cli db:seed:all",
+    "db:test-seed": "npx sequelize-cli db:seed:all",
     "lint": "eslint .",
     "lint:fix": "eslint --fix"
   },
