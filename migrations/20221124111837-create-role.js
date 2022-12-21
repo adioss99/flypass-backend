@@ -24,6 +24,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Roles', { truncate: true, cascade: true });
+    await queryInterface.dropTable('Roles');
   }
 };
