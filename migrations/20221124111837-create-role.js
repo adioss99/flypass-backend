@@ -2,7 +2,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.sequelize.query("ALTER TABLE table_name AUTO_INCREMENT = 1000000;");
     await queryInterface.createTable('Roles', {
       id: {
         allowNull: false,
