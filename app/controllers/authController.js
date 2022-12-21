@@ -127,6 +127,34 @@ const handleGoogleAuthCb = async (req, res) => {
   }
 };
 
+const registerTest = ((roles) => (async (req, res, next) => {
+  const email = req.body.email.toLowerCase();
+  const {
+    name, password, confirmationPassword, birthDate, gender, phone,
+  } = req.body;
+  const role = roles !== 1 || null ? 2 : 1;
+  if (password !== confirmationPassword) {
+    res.status(401).json({ message: 'password doesn`t match' });
+  }
+  try {
+    const encryptedPassword = await encryptPassword(password);
+
+    const user = await User.create({
+      name,
+      email,
+      encryptedPassword,
+      birthDate: new Date(birthDate).toISOString(),
+      gender,
+      phone,
+      roleId: role,
+    });
+    res.status(200).json({ message: 'Register Success' })
+    req.payload = user
+    next()
+  } catch (err) {
+    res.status(400).json({ err: { name: err.name, message: err.message } })
+  }
+}))
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
   const {
@@ -137,20 +165,22 @@ const register = async (req, res, roles) => {
     res.status(401).json({ message: 'password doesn`t match' });
     return;
   }
-  const encryptedPassword = await encryptPassword(password);
+  try {
+    const encryptedPassword = await encryptPassword(password);
 
-  await User.create({
-    name,
-    email,
-    encryptedPassword,
-    birthDate: new Date(birthDate).toISOString(),
-    gender,
-    phone,
-    roleId: role,
-  });
-  res.status(201).json({
-    message: 'register success',
-  });
+    const user = await User.create({
+      name,
+      email,
+      encryptedPassword,
+      birthDate: new Date(birthDate).toISOString(),
+      gender,
+      phone,
+      roleId: role,
+    });
+    res.status(200).json('Register success')
+  } catch (err) {
+    res.status(400).json({ err: { name: err.name, message: err.message } })
+  }
 };
 
 const registerAdmin = async (req, res) => {
@@ -317,6 +347,7 @@ module.exports = {
   handleGoogleAuthUrl,
   handleGoogleAuthCb,
   register,
+  registerTest,
   registerAdmin,
   login,
   whoAmI,

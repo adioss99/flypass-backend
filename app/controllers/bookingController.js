@@ -167,7 +167,7 @@ const handleBookFlight = async (req, res, next) => {
       passenger,
       passengerBooking,
     }
-    req.bookingData = response
+    req.payload = response
     res.status(200).json(response)
     next()
   } catch (err) {

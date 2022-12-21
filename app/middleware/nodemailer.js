@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const ejs = require('ejs')
 
 const {
   MAILER_HOST,
@@ -17,14 +18,37 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-const handleSendBookingInfo = async (req, res) => {
+const ejsHtml = (filename, data) => ejs.renderFile(`${__dirname}/mailer-templates/${filename}.ejs`, data)
+const sendEmailVerification = async (req, res) => {
+  try {
+    const { name, email } = req.payload
+    const data = {
+      receiver: name,
+      content: email,
+    }
+    const html = await ejsHtml('test', data)
+    console.log(html)
+    const info = await transporter.sendMail({
+      from: `"Flypass" <${MAILER_ACCOUNT}`, // sender address
+      to: 'adamsatria948@gmail.com', // list of receivers
+      subject: 'Please verify your email', // Subject line
+      text: 'Hello world?', // plain text body
+      html,
+    });
+    console.log('Message sent: %s', info.messageId);
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const sendBookingInfo = async (req, res) => {
   try {
     const bookingData = req.bookingData.booking
     const {
-      contactTitle, contactFirstname, contactLastName, contactEmail,
+      contactTitle, contactFirstName, contactLastName, contactEmail,
     } = req.body
     const context = {
-      name: `${contactTitle}. ${contactFirstname} ${contactLastName}`,
+      name: `${contactTitle}. ${contactFirstName} ${contactLastName}`,
     }
     // const info = await transporter.sendMail({
     //   from: `"Flypass" <${MAILER_ACCOUNT}`, // sender address
@@ -39,4 +63,7 @@ const handleSendBookingInfo = async (req, res) => {
   }
 }
 
-module.exports = { handleSendBookingInfo }
+module.exports = {
+  sendBookingInfo,
+  sendEmailVerification,
+}
