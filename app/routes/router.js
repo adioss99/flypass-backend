@@ -53,7 +53,9 @@ router.delete('/v1/flights/:id', authorize, isAdmin, flightController.handleDele
 router.get('/v1/gsiauth', authController.handleGoogleAuthUrl);
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb);
 router.post('/v1/login', authController.login);
-router.post('/v1/register', emailExist, authController.register);
+router.post('/v1/abc', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
+router.post('/v1/register', emailExist, authController.register, nodeMailer.sendEmailVerification);
+
 router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
 router.get('/v1/whoami', authorize, authController.whoAmI);
 router.get('/v1/refresh', authController.refreshToken);
@@ -75,7 +77,7 @@ router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.delete
 router.get('/v1/airport', airportController.getAirport);
 
 // booking
-router.post('/v1/flights/books', bookingController.handleBookFlight, nodeMailer.send)
+router.post('/v1/flights/books', bookingController.handleBookFlight, nodeMailer.sendBookingInfo)
 router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListBookings);
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
@@ -97,6 +99,11 @@ router.get('/v1/notification/admin', notificationController.getNotificationAdmin
 router.get('/v1/notification', notificationController.getNotificationUser);
 router.put('/v1/notification/:id', notificationController.updateNotification)
 
+// mail preview
+
+router.get('/mail', (req,res) => {
+  res.render('test.ejs'); 
+})
 router.use(authController.onLost);
 router.use(authController.onError);
 
