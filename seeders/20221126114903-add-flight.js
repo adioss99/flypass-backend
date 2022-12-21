@@ -39,8 +39,12 @@ module.exports = {
     for (let i = 0; i < 10; i++) {
       data.push(generateFlights(5945, 5793, '01:30', 1))
       data.push(generateFlights(5793, 5945, '01:45', 1))
+      data.push(generateFlights(5945, 5798, '01:15', 1))
+      data.push(generateFlights(5798, 5945, '01:15', 1))
+      data.push(generateFlights(5945, 5780, '01:30', 1))
+      data.push(generateFlights(5780, 5945, '01:30', 1))
     }
-    
+
     await queryInterface.bulkInsert('Flights', data)
   },
 
