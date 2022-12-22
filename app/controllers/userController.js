@@ -1,6 +1,20 @@
+const bcrypt = require('bcryptjs');
 const { User, Role } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
 
+const SALT = 10;
+
+function encryptPassword(password) {
+  return new Promise((resolve, reject) => {
+    bcrypt.hash(password, SALT, (err, encryptedPassword) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(encryptedPassword);
+    });
+  });
+}
 const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -86,8 +100,40 @@ const getAlluser = async (req, res) => {
   }
 };
 
+const changepassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const olddpassword = req.body;
+    const { newpassword, Newconfirmpassword } = req.body;
+    if (newpassword !== Newconfirmpassword) {
+      res.status(401).json({ message: 'password doesn`t match' });
+    }
+    const encryptedPassword = await encryptPassword(Newconfirmpassword);
+
+    await User.update(
+      {
+        olddpassword,
+        encryptedPassword,
+      },
+      { where: { id: userId } },
+    );
+    res.status(201).json({
+      userId,
+      message: 'Update password success',
+    });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 module.exports = {
   updateProfiles,
+  changepassword,
   getProfile,
   getAlluser,
 };

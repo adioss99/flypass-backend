@@ -38,6 +38,7 @@ router.use(form.array());
 // user
 router.get('/v1/user', authorize, userController.getProfile);
 router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
+router.put('/v1/changepassword', authorize, userController.changepassword);
 
 // flight
 router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
