@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.PassengerContact,{
         foreignKey: 'passengerContactId'
       })
+      this.hasMany(models.walletHistory, {
+        foreignKey: 'bookingId',
+      });
     }
   }
   Booking.init({
