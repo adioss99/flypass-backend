@@ -8,6 +8,7 @@ const bookingController = require('./bookingController');
 const wishlistController = require('./wishlistController');
 const notificationController = require('./notificationController');
 const transaction = require('./transactionController');
+const eWalletController = require('./walletController');
 
 const getStarted = (req, res) => {
   res.status(200).json({
@@ -28,4 +29,5 @@ module.exports = {
   wishlistController,
   transaction,
   notificationController,
+  eWalletController,
 };

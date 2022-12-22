@@ -15,6 +15,7 @@ const {
   wishlistController,
   transaction,
   notificationController,
+  eWalletController,
 } = require('../controllers');
 
 const { authorize, isAdmin } = require('../middleware/authorization');
@@ -98,6 +99,15 @@ router.get('/v1/notification/admin', authorize, isAdmin, notificationController.
 router.get('/v1/notification', authorize, notificationController.getNotificationUser);
 router.put('/v1/notification/:id', authorize, notificationController.updateNotification);
 router.delete('/v1/notification/:id', authorize, notificationController.deleteNotification);
+
+// wallet
+router.post('/v1/wallet', authorize, eWalletController.activateEwallet);
+router.get('/v1/wallet', authorize, eWalletController.getUserWalet);
+router.post('/v1/wallet/topup', authorize, eWalletController.topUpRequest);
+router.post('/v1/wallet/topup/confirm/:walletHistoryId', authorize, eWalletController.topUpConfirmation);
+router.post('/v1/wallet/payment/:bookingId', authorize, eWalletController.paymentHandler);
+router.get('/v1/wallet/history', authorize, eWalletController.getWalletHistory);
+router.get('/v1/wallet/history/:walletHistoryId', authorize, eWalletController.getDetailWalletHistory);
 
 router.use(authController.onLost);
 router.use(authController.onError);
