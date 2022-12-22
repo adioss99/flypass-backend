@@ -1,5 +1,6 @@
 const { Transaction, Booking } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
+const { createNotification } = require('./notificationController');
 
 const imageUploader = async (req, res, fileBase64) => {
   const file = `data:${req.file.mimetype};base64,${fileBase64}`;
@@ -11,14 +12,18 @@ const imageUploader = async (req, res, fileBase64) => {
   return [image, imageId];
 };
 
+const findBooking = async (params) => {
+  const book = await Booking.findByPk(params)
+  return book
+}
+
 const transactionHandle = async (req, res) => {
   try {
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    const { bookingId, TransactionMethodId } = req.body;
+    const { bookingId } = req.params;
     const transaction = await Transaction.create({
       bookingId,
-      TransactionMethodId,
       datePayed: new Date(),
       isPayed: false,
       Image: img[0],
@@ -30,7 +35,22 @@ const transactionHandle = async (req, res) => {
         where: { id: transaction.bookingId },
       },
     );
-    res.status(201).json({ message: 'created successfully', transaction });
+    await createNotification('Payment need to be verificated', null, bookingId, true, null);
+    res.status(201).json({ message: 'created successfully', bookingId });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const getBookingTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findAll({ where: { bookingId: req.params.bookingId } });
+    res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
       error: {
@@ -74,13 +94,11 @@ const handlepayment = async (req, res) => {
     const transaction = await Transaction.findByPk(req.params.id);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
-    // eslint-disable-next-line no-unused-expressions
     await transaction.update({
       Image: img[0],
       imageId: img[1],
       datePayed: new Date(),
-      // eslint-disable-next-line no-sequences
-    }),
+    })
     res
       .status(201)
       .json({ message: 'updated successfully', transaction });
@@ -107,9 +125,13 @@ const handleConfirmPayment = async (req, res) => {
         where: { id: transaction.bookingId },
       },
     );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment has been verificated', booking.bookingCode, booking.id, false, booking.userId);
+    }
     res.status(201).json({
-      transaction,
       message: 'Payment Success',
+      transaction,
     });
   } catch (err) {
     res.status(422).json({
@@ -120,22 +142,26 @@ const handleConfirmPayment = async (req, res) => {
     });
   }
 };
+
 const handleRejectPayment = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
     await transaction.update({
       isPayed: false,
     });
-
     await Booking.update(
       { bookingStatusId: 4 },
       {
         where: { id: transaction.bookingId },
       },
     );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment rejected', booking.bookingCode, booking.id, false, booking.userId);
+    }
     res.status(201).json({
+      message: 'Payment rejected',
       transaction,
-      message: 'Payment fail ',
     });
   } catch (err) {
     res.status(422).json({
@@ -150,6 +176,7 @@ const handleRejectPayment = async (req, res) => {
 module.exports = {
   handlepayment,
   gettranscationId,
+  getBookingTransaction,
   getalltransaction,
   handleConfirmPayment,
   handleRejectPayment,

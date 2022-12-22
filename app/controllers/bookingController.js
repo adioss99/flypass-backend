@@ -54,13 +54,13 @@ const bookingInc = [
     model: Flight,
     as: 'flight1',
     attributes: flightAttr,
-    include: flightInc, // kalo pake variable yang sama error
+    include: flightInc,
   },
   {
     model: Flight,
     as: 'flight2',
     attributes: flightAttr,
-    include: flight2Inc, // kalo pake variable yang sama error
+    include: flight2Inc,
   },
   {
     model: Passenger,
@@ -159,7 +159,7 @@ const handleBookFlight = async (req, res, next) => {
     );
 
     if (userId) {
-      createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
+      await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
     const response = {
       booking,
