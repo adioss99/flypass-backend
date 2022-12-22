@@ -4,10 +4,9 @@ const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const { Op } = require('sequelize');
 const { User } = require('../../models');
 
-const { people } = google.people('v1');
 const SALT = 10;
 
 const {
@@ -58,9 +57,6 @@ const handleGoogleAuthUrl = async (req, res) => {
   const scopes = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
-    'https://www.googleapis.com/auth/user.birthday.read',
-    'https://www.googleapis.com/auth/user.gender.read',
-    'https://www.googleapis.com/auth/user.phonenumbers.read',
     'openid',
   ];
   try {
@@ -78,8 +74,7 @@ const handleGoogleAuthUrl = async (req, res) => {
 const handleGoogleAuthCb = async (req, res) => {
   const data = req.query;
   const { tokens } = await oauth2Client.getToken(data.code);
-  oauth2Client.credentials = tokens;
-  res.end('Success')
+  res.status(200).json(tokens)
 }
 
 const verifyIdToken = async (req, res, next) => {
@@ -101,23 +96,76 @@ const verifyIdToken = async (req, res, next) => {
   }
 }
 
-const handleLoginRegisterGoogle = async (req, res) => {
+const handleRegisterGoogle = async (req, res) => {
+  const data = res.payload
+  const {
+    name, birthDate, gender, phone,
+  } = req.body;
+  try {
+    const isUser = await User.findOne({
+      where: {
+        [Op.or]: [
+          {
+            [Op.and]: [{ email: data.email }, { googleId: null }],
+          },
+          {
+            googleId: data.sub,
+          },
+        ],
+      },
+    })
+    if (isUser) {
+      res.status(400).json({ message : 'You already have an account registered with this email' })
+      return
+    }
+    const user = await User.create({
+      name,
+      email: data.email,
+      birthDate,
+      gender,
+      phone,
+      image: data.picture,
+      googleId: data.sub,
+      roleId: 2,
+    })
+    res.status(200).json({ msg: 'Registered succesfully.' })
+  } catch (err) {
+    res.status(400).json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+
+const handleLoginGoogle = async (req, res) => {
   try {
     const data = res.payload
 
-    const [user] = await User.findOrCreate({
+    const user = await User.findOne({
       where: { googleId: data.sub },
-      defaults: {
-        name: data.given_name,
-        email: data.email,
-        image: data.picture,
-        roleId: 2,
-      },
     });
-    const accessToken = createToken({ user });
-    const accesstToken = accessToken[0];
-    const refreshToken = accessToken[1];
 
+    if (!user) {
+      res.status(404).json({ message: 'Email not found' });
+      return;
+    }
+
+    const token = createToken({
+      id: user.id,
+      name: user.name,
+      image: user.image,
+      email: user.email,
+      birthDate: user.birthDate,
+      gender: user.gender,
+      phone: user.phone,
+      roleId: user.roleId,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+    const accesstToken = token[0];
+    const refreshToken = token[1];
     await User.update(
       { refreshToken },
       {
@@ -126,20 +174,18 @@ const handleLoginRegisterGoogle = async (req, res) => {
         },
       },
     );
-    res
-      .cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      })
-      .status(200)
-      .json({
-        message: 'login success',
-        user: {
-          id: user.id,
-          email: user.email,
-          accesstToken,
-        },
-      });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.status(201).json({
+      message: 'login success',
+      user: {
+        id: user.id,
+        email: user.email,
+        accesstToken,
+      },
+    });
   } catch (err) {
     res
       .status(401)
@@ -334,7 +380,8 @@ const refreshToken = async (req, res) => {
 };
 
 module.exports = {
-  handleLoginRegisterGoogle,
+  handleRegisterGoogle,
+  handleLoginGoogle,
   handleGoogleAuthUrl,
   handleGoogleAuthCb,
   verifyIdToken,
