@@ -115,7 +115,7 @@ const handleRegisterGoogle = async (req, res) => {
       },
     })
     if (isUser) {
-      res.status(400).json({ msg: 'You already have an account registered with this email' })
+      res.status(400).json({ message : 'You already have an account registered with this email' })
       return
     }
     const user = await User.create({
@@ -133,7 +133,7 @@ const handleRegisterGoogle = async (req, res) => {
     res.status(400).json({
       err: {
         name: err.name,
-        msg: err.message,
+        message: err.message,
       },
     })
   }
