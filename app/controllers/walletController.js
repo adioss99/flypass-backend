@@ -46,7 +46,7 @@ const activateEwallet = async (req, res) => {
     const user = req.user.id;
     const check = await Wallet.findOne({ where: { userId: user } })
     if (check) {
-      res.status(401).json({ message: 'you already have a eWallet' });
+      res.status(401).json({ message: 'your wallet is active' });
       return
     }
     const { pin } = req.body;
@@ -67,6 +67,10 @@ const getUserWalet = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await Wallet.findOne({ where: { userId: user }, attributes: ['id', 'balance', 'createdAt', 'updatedAt'] });
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     res.status(200).json({ wallet });
   } catch (err) {
     res.status(422).json({
@@ -82,6 +86,10 @@ const topUpRequest = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     const { amount } = req.body;
     const request = await createHistory({
       walletId: wallet.id,
@@ -131,7 +139,7 @@ const paymentHandler = async (req, res) => {
     const { pin } = req.body;
     const wallet = await getWallet(user);
     if (!wallet) {
-      res.status(401).json({ message: 'Please activate your wawllet' });
+      res.status(401).json({ message: 'Please activate your wallet' });
       return;
     }
     const verify = await verificationPIN(wallet.pin, pin);
@@ -168,6 +176,10 @@ const getWalletHistory = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     const history = await walletHistory.findAll({
       where: { walletId: wallet.id },
       attributes: ['id', 'balance', 'type', 'status', 'updatedAt'],
