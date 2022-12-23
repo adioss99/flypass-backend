@@ -130,6 +130,10 @@ const paymentHandler = async (req, res) => {
     const { bookingId } = req.params;
     const { pin } = req.body;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wawllet' });
+      return;
+    }
     const verify = await verificationPIN(wallet.pin, pin);
     if (!verify) {
       res.status(401).json({ message: 'wrong PIN' });
