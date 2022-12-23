@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { Wallet, Booking, walletHistory } = require('../../models');
+const { createNotification } = require('./notificationController');
 
 function encryptPIN(pin) {
   return new Promise((resolve, reject) => {
@@ -161,6 +162,7 @@ const paymentHandler = async (req, res) => {
     });
     await book.update({ bookingStatusId: 3 });
     await wallet.decrement('balance', { by: book.totalPrice });
+    await createNotification('Your payment using wallet success', book.bookingCode, book.id, false, user);
     res.status(200).json({ message: 'payment success' });
   } catch (err) {
     res.status(422).json({
