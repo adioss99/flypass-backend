@@ -4,8 +4,8 @@ const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Op } = require('sequelize');
-const { User } = require('../../models');
+const randomstring = require('randomstring')
+const { User, UserEmailConfirmation } = require('../../models');
 
 const SALT = 10;
 
@@ -193,6 +193,39 @@ const handleLoginGoogle = async (req, res) => {
   }
 }
 
+const registerTest = ((roles) => (async (req, res, next) => {
+  const email = req.body.email.toLowerCase();
+  const {
+    name, password, confirmationPassword, birthDate, gender, phone,
+  } = req.body;
+  const role = roles !== 1 || null ? 2 : 1;
+  if (password !== confirmationPassword) {
+    res.status(401).json({ message: 'password doesn`t match' });
+  }
+  try {
+    const encryptedPassword = await encryptPassword(password);
+
+    const user = await User.create({
+      name,
+      email,
+      encryptedPassword,
+      birthDate,
+      gender,
+      phone,
+      roleId: role,
+    });
+
+    const emailConfirmation = await UserEmailConfirmation.create({
+      userId: user.id,
+      token: randomstring.generate(32),
+    })
+    res.status(200).json({ message: 'Register success.' })
+    req.payload = { user, emailConfirmation }
+    next()
+  } catch (err) {
+    res.status(400).json({ err: { name: err.name, message: err.message } })
+  }
+}))
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
   const {
@@ -203,24 +236,26 @@ const register = async (req, res, roles) => {
     res.status(401).json({ message: 'password doesn`t match' });
     return;
   }
-  const encryptedPassword = await encryptPassword(password);
+  try {
+    const encryptedPassword = await encryptPassword(password);
 
-  await User.create({
-    name,
-    email,
-    encryptedPassword,
-    birthDate: new Date(birthDate).toISOString(),
-    gender,
-    phone,
-    roleId: role,
-  });
-  res.status(201).json({
-    message: 'register success',
-  });
+    const user = await User.create({
+      name,
+      email,
+      encryptedPassword,
+      birthDate: new Date(birthDate).toISOString(),
+      gender,
+      phone,
+      roleId: role,
+    });
+    res.status(200).json('Register success')
+  } catch (err) {
+    res.status(400).json({ err: { name: err.name, message: err.message } })
+  }
 };
 
 const registerAdmin = async (req, res) => {
-  register(req, res, 1);
+  registerTest(1)
 };
 
 const login = async (req, res) => {
@@ -379,13 +414,48 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const handleEmailVerify = async (req, res) => {
+  try {
+    const { token } = req.query
+    const isTokenValid = await UserEmailConfirmation.findOne({
+      where: {
+        token,
+      },
+    })
+
+    if (!isTokenValid) {
+      res.status(400).json({ message: 'Invalid email verification Token!' })
+      return
+    }
+
+    await User.update(
+      { isVerified: true },
+      {
+        where: {
+          id: isTokenValid.userId,
+        },
+      },
+    )
+    res.status(200).json({ message: 'Email verification success' })
+  } catch (err) {
+    res.status(400).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+
 module.exports = {
   handleRegisterGoogle,
   handleLoginGoogle,
   handleGoogleAuthUrl,
   handleGoogleAuthCb,
   verifyIdToken,
+  handleEmailVerify,
   register,
+  registerTest,
   registerAdmin,
   login,
   whoAmI,

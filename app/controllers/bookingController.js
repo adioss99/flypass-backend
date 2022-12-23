@@ -92,7 +92,7 @@ const handleListBookings = async (req, res) => {
   }
 };
 
-const handleBookFlight = async (req, res) => {
+const handleBookFlight = async (req, res, next) => {
   try {
     const user = userToken(req);
     const {
@@ -161,12 +161,15 @@ const handleBookFlight = async (req, res) => {
     if (userId) {
       await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
-    res.status(200).json({
+    const response = {
       booking,
       passengerContact,
       passenger,
       passengerBooking,
-    });
+    }
+    req.payload = response
+    res.status(200).json(response)
+    next()
   } catch (err) {
     res.status(422).json({
       error: {
