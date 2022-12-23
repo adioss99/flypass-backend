@@ -15,8 +15,10 @@ const {
   wishlistController,
   transaction,
   notificationController,
+  eWalletController,
 } = require('../controllers');
 
+const { nodeMailer } = require('../middleware')
 const { authorize, isAdmin } = require('../middleware/authorization');
 const emailExist = require('../middleware/emailCheck');
 const uploadOnMemory = require('../middleware/uploadOnMemory');
@@ -54,8 +56,9 @@ router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb)
 router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle)
 router.post('/v1/googlelogin', authController.verifyIdToken, authController.handleLoginGoogle)
 router.post('/v1/login', authController.login);
-router.post('/v1/register', emailExist, authController.register);
-router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
+router.post('/v1/register', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
+router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerTest(1));
+router.post('/v1/verify?:token?', authController.handleEmailVerify);
 router.get('/v1/whoami', authorize, authController.whoAmI);
 router.get('/v1/refresh', authController.refreshToken);
 router.get('/v1/logout', authController.logout);
@@ -76,7 +79,7 @@ router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.delete
 router.get('/v1/airport', airportController.getAirport);
 
 // booking
-router.post('/v1/flights/books', bookingController.handleBookFlight)
+router.post('/v1/flights/books', bookingController.handleBookFlight, nodeMailer.sendBookingInfo)
 router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListBookings);
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
@@ -99,6 +102,15 @@ router.get('/v1/notification/admin', authorize, isAdmin, notificationController.
 router.get('/v1/notification', authorize, notificationController.getNotificationUser);
 router.put('/v1/notification/:id', authorize, notificationController.updateNotification);
 router.delete('/v1/notification/:id', authorize, notificationController.deleteNotification);
+
+// wallet
+router.post('/v1/wallet', authorize, eWalletController.activateEwallet);
+router.get('/v1/wallet', authorize, eWalletController.getUserWalet);
+router.post('/v1/wallet/topup', authorize, eWalletController.topUpRequest);
+router.post('/v1/wallet/topup/confirm/:walletHistoryId', authorize, eWalletController.topUpConfirmation);
+router.post('/v1/wallet/payment/:bookingId', authorize, eWalletController.paymentHandler);
+router.get('/v1/wallet/history', authorize, eWalletController.getWalletHistory);
+router.get('/v1/wallet/history/:walletHistoryId', authorize, eWalletController.getDetailWalletHistory);
 
 router.use(authController.onLost);
 router.use(authController.onError);
