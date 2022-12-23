@@ -53,10 +53,9 @@ router.get('/v1/gsiauth', authController.handleGoogleAuthUrl)
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb);
 router.post('/v1/googleidtokenlogin', authController.verifyIdToken, authController.handleLoginRegisterGoogle)
 router.post('/v1/login', authController.login);
-router.post('/v1/abc', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
-router.post('/v1/register', emailExist, authController.register, nodeMailer.sendEmailVerification);
-
-router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerAdmin);
+router.post('/v1/register', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
+router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerTest(1));
+router.post('/v1/verify?:token?', authController.handleEmailVerify);
 router.get('/v1/whoami', authorize, authController.whoAmI);
 router.get('/v1/refresh', authController.refreshToken);
 router.get('/v1/logout', authController.logout);
@@ -101,11 +100,6 @@ router.get('/v1/notification', authorize, notificationController.getNotification
 router.put('/v1/notification/:id', authorize, notificationController.updateNotification);
 router.delete('/v1/notification/:id', authorize, notificationController.deleteNotification);
 
-// mail preview
-
-router.get('/mail', (req,res) => {
-  res.render('test.ejs'); 
-})
 router.use(authController.onLost);
 router.use(authController.onError);
 

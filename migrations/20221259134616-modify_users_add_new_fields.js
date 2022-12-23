@@ -10,10 +10,15 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
     return Promise.all([
-      queryInterface.addColumn('Passengers', 'baggage', {
-        type: Sequelize.ARRAY(Sequelize.INTEGER),
-        allowNull: true,
-      }),
+      queryInterface.addColumn(
+        'Users',
+        'isVerified',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        }
+      ),
     ]);
   },
 
@@ -24,6 +29,5 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-     return Promise.all([queryInterface.removeColumn('Passengers', 'baggage')]);
   }
 };

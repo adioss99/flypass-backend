@@ -4,10 +4,9 @@ const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
-const { User } = require('../../models');
+const randomstring = require('randomstring')
+const { User, UserEmailConfirmation } = require('../../models');
 
-const { people } = google.people('v1');
 const SALT = 10;
 
 const {
@@ -163,13 +162,18 @@ const registerTest = ((roles) => (async (req, res, next) => {
       name,
       email,
       encryptedPassword,
-      birthDate: new Date(birthDate).toISOString(),
+      birthDate,
       gender,
       phone,
       roleId: role,
     });
-    res.status(200).json({ message: 'Register Success' })
-    req.payload = user
+
+    const emailConfirmation = await UserEmailConfirmation.create({
+      userId: user.id,
+      token: randomstring.generate(32),
+    })
+    res.status(200).json({ message: 'Register success.' })
+    req.payload = { user, emailConfirmation }
     next()
   } catch (err) {
     res.status(400).json({ err: { name: err.name, message: err.message } })
@@ -204,7 +208,7 @@ const register = async (req, res, roles) => {
 };
 
 const registerAdmin = async (req, res) => {
-  register(req, res, 1);
+  registerTest(1)
 };
 
 const login = async (req, res) => {
@@ -363,11 +367,45 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const handleEmailVerify = async (req, res) => {
+  try {
+    const { token } = req.query
+    const isTokenValid = await UserEmailConfirmation.findOne({
+      where: {
+        token,
+      },
+    })
+
+    if (!isTokenValid) {
+      res.status(400).json({ message: 'Invalid email verification Token!' })
+      return
+    }
+
+    await User.update(
+      { isVerified: true },
+      {
+        where: {
+          id: isTokenValid.userId,
+        },
+      },
+    )
+    res.status(200).json({ message: 'Email verification success' })
+  } catch (err) {
+    res.status(400).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+
 module.exports = {
   handleLoginRegisterGoogle,
   handleGoogleAuthUrl,
   handleGoogleAuthCb,
   verifyIdToken,
+  handleEmailVerify,
   register,
   registerTest,
   registerAdmin,

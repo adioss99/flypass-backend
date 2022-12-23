@@ -19,22 +19,26 @@ const transporter = nodemailer.createTransport({
 })
 
 const ejsHtml = (filename, data) => ejs.renderFile(`${__dirname}/mailer-templates/${filename}.ejs`, data)
+
+const mailOptions = ((toEmail, subject, html) => ({
+  from: `"Flypass" <${MAILER_ACCOUNT}`,
+  to: toEmail,
+  subject,
+  html,
+}))
+
 const sendEmailVerification = async (req, res) => {
   try {
-    const { name, email } = req.payload
+    const { name, email } = req.payload.user
+    const { token } = req.payload.emailConfirmation
+    console.log(name, email)
     const data = {
-      receiver: name,
-      content: email,
+      name,
+      token,
     }
-    const html = await ejsHtml('test', data)
-    console.log(html)
-    const info = await transporter.sendMail({
-      from: `"Flypass" <${MAILER_ACCOUNT}`, // sender address
-      to: 'adamsatria948@gmail.com', // list of receivers
-      subject: 'Please verify your email', // Subject line
-      text: 'Hello world?', // plain text body
-      html,
-    });
+    const html = await ejsHtml('emailConfirmation', data)
+    const subject = 'Welcome to FlyPass! Please Verify Your Account'
+    const info = await transporter.sendMail(mailOptions(email, subject, html))
     console.log('Message sent: %s', info.messageId);
   } catch (error) {
     console.log(error)

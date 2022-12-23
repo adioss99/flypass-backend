@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Booking,{
         foreignKey: 'userId'
       })
+      this.hasMany(models.UserEmailConfirmation,{
+        foreignKey: 'userId'
+      })
     }
   }
   User.init(
@@ -28,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: DataTypes.STRING,
       birthDate: DataTypes.STRING,
       gender: DataTypes.STRING,
+      isVerified: DataTypes.BOOLEAN,
       googleId: DataTypes.STRING,
       roleId: DataTypes.INTEGER,
       refreshToken: DataTypes.TEXT,
