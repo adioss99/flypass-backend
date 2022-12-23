@@ -1,16 +1,19 @@
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 const { google } = require('googleapis');
-const { OAuth2Client } = require('google-auth-library');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const randomstring = require('randomstring')
+const randomstring = require('randomstring');
+const { Op } = require('sequelize');
 const { User, UserEmailConfirmation } = require('../../models');
 
 const SALT = 10;
 
 const {
-  GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URL, GOOGLE_CLIENT_ID_ANDROID,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URL,
+  GOOGLE_CLIENT_ID_ANDROID,
 } = process.env;
 
 const oauth2Client = new google.auth.OAuth2(
@@ -65,7 +68,7 @@ const handleGoogleAuthUrl = async (req, res) => {
       scope: scopes,
       prompt: 'consent',
     });
-    res.status(200).json(url)
+    res.status(200).json(url);
   } catch (err) {
     res.status(401).json({ error: { name: err.name, message: err.message } });
   }
@@ -74,30 +77,30 @@ const handleGoogleAuthUrl = async (req, res) => {
 const handleGoogleAuthCb = async (req, res) => {
   const data = req.query;
   const { tokens } = await oauth2Client.getToken(data.code);
-  res.status(200).json(tokens)
-}
+  res.status(200).json(tokens);
+};
 
 const verifyIdToken = async (req, res, next) => {
-  const { IdToken } = req.body
+  const { IdToken } = req.body;
   try {
     const ticket = await oauth2Client.verifyIdToken({
       idToken: IdToken,
       audience: [GOOGLE_CLIENT_ID, GOOGLE_CLIENT_ID_ANDROID],
-    })
+    });
     res.payload = ticket.getPayload();
-    next()
+    next();
   } catch (err) {
     res.status(400).json({
       err: {
         name: err.name,
         message: err.message,
       },
-    })
+    });
   }
-}
+};
 
 const handleRegisterGoogle = async (req, res) => {
-  const data = res.payload
+  const data = res.payload;
   const {
     name, birthDate, gender, phone,
   } = req.body;
@@ -113,10 +116,14 @@ const handleRegisterGoogle = async (req, res) => {
           },
         ],
       },
-    })
+    });
     if (isUser) {
-      res.status(400).json({ message : 'You already have an account registered with this email' })
-      return
+      res
+        .status(400)
+        .json({
+          message: 'You already have an account registered with this email',
+        });
+      return;
     }
     const user = await User.create({
       name,
@@ -127,21 +134,21 @@ const handleRegisterGoogle = async (req, res) => {
       image: data.picture,
       googleId: data.sub,
       roleId: 2,
-    })
-    res.status(200).json({ msg: 'Registered succesfully.' })
+    });
+    res.status(200).json({ msg: 'Registered succesfully.' });
   } catch (err) {
     res.status(400).json({
       err: {
         name: err.name,
         message: err.message,
       },
-    })
+    });
   }
-}
+};
 
 const handleLoginGoogle = async (req, res) => {
   try {
-    const data = res.payload
+    const data = res.payload;
 
     const user = await User.findOne({
       where: { googleId: data.sub },
@@ -191,9 +198,9 @@ const handleLoginGoogle = async (req, res) => {
       .status(401)
       .json({ error: { err, name: err.name, message: err.message } });
   }
-}
+};
 
-const registerTest = ((roles) => (async (req, res, next) => {
+const registerTest = (roles) => async (req, res, next) => {
   const email = req.body.email.toLowerCase();
   const {
     name, password, confirmationPassword, birthDate, gender, phone,
@@ -218,14 +225,15 @@ const registerTest = ((roles) => (async (req, res, next) => {
     const emailConfirmation = await UserEmailConfirmation.create({
       userId: user.id,
       token: randomstring.generate(32),
-    })
-    res.status(200).json({ message: 'Register success.' })
-    req.payload = { user, emailConfirmation }
-    next()
+    });
+    res.status(200).json({ message: 'Register success.' });
+    req.payload = { user, emailConfirmation };
+    next();
   } catch (err) {
-    res.status(400).json({ err: { name: err.name, message: err.message } })
+    res.status(400).json({ err: { name: err.name, message: err.message } });
   }
-}))
+};
+
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
   const {
@@ -248,14 +256,14 @@ const register = async (req, res, roles) => {
       phone,
       roleId: role,
     });
-    res.status(200).json('Register success')
+    res.status(200).json('Register success');
   } catch (err) {
-    res.status(400).json({ err: { name: err.name, message: err.message } })
+    res.status(400).json({ err: { name: err.name, message: err.message } });
   }
 };
 
 const registerAdmin = async (req, res) => {
-  registerTest(1)
+  registerTest(1);
 };
 
 const login = async (req, res) => {
@@ -416,16 +424,16 @@ const refreshToken = async (req, res) => {
 
 const handleEmailVerify = async (req, res) => {
   try {
-    const { token } = req.query
+    const { token } = req.query;
     const isTokenValid = await UserEmailConfirmation.findOne({
       where: {
         token,
       },
-    })
+    });
 
     if (!isTokenValid) {
-      res.status(400).json({ message: 'Invalid email verification Token!' })
-      return
+      res.status(400).json({ message: 'Invalid email verification Token!' });
+      return;
     }
 
     await User.update(
@@ -435,17 +443,17 @@ const handleEmailVerify = async (req, res) => {
           id: isTokenValid.userId,
         },
       },
-    )
-    res.status(200).json({ message: 'Email verification success' })
+    );
+    res.status(200).json({ message: 'Email verification success' });
   } catch (err) {
     res.status(400).json({
       error: {
         name: err.name,
         message: err.message,
       },
-    })
+    });
   }
-}
+};
 
 module.exports = {
   handleRegisterGoogle,
