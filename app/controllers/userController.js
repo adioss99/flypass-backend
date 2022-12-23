@@ -15,6 +15,7 @@ function encryptPassword(password) {
     });
   });
 }
+
 const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -103,11 +104,22 @@ const getAlluser = async (req, res) => {
 const changepassword = async (req, res) => {
   try {
     const userId = req.user.id;
-    const olddpassword = req.body;
+    const { olddpassword } = req.body;
     const { newpassword, Newconfirmpassword } = req.body;
+
+    const isMatch = await bcrypt.compare(
+      olddpassword,
+      req.user.encryptedPassword,
+    );
+    if (!isMatch) {
+      res.status(404).json({ message: 'Wrong password' })
+      return;
+    }
     if (newpassword !== Newconfirmpassword) {
       res.status(401).json({ message: 'password doesn`t match' });
+      return;
     }
+
     const encryptedPassword = await encryptPassword(Newconfirmpassword);
 
     await User.update(
@@ -118,7 +130,6 @@ const changepassword = async (req, res) => {
       { where: { id: userId } },
     );
     res.status(201).json({
-      userId,
       message: 'Update password success',
     });
   } catch (err) {
