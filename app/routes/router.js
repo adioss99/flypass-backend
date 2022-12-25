@@ -79,7 +79,7 @@ router.delete('/v1/airplanes/:id', authorize, isAdmin, airplaneController.delete
 router.get('/v1/airport', airportController.getAirport);
 
 // booking
-router.post('/v1/flights/books', bookingController.handleBookFlight, nodeMailer.sendBookingInfo)
+router.post('/v1/flights/books', bookingController.handleBookFlight)
 router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListBookings);
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
