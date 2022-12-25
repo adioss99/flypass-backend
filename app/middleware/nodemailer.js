@@ -47,7 +47,8 @@ const sendEmailVerification = async (req, res) => {
 
 const sendBookingInfo = async (req, res) => {
   try {
-    const bookingData = req.bookingData.booking
+    const bookingData = req.payload
+    console.log(bookingData)
     const {
       contactTitle, contactFirstName, contactLastName, contactEmail,
     } = req.body

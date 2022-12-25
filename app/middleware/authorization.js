@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const jwt = require('jsonwebtoken');
 const { User } = require('../../models');
 
@@ -24,4 +25,33 @@ const isAdmin = async (req, res, next) => {
   next();
 };
 
-module.exports = { authorize, isAdmin };
+const isUserVerified = async (req, res, next) => {
+  try {
+    const isVerified = await User.findOne({
+      where: {
+        [Op.and]: [
+          {
+            id: req.user.id,
+          },
+          {
+            isVerified: true,
+          },
+        ],
+      },
+    })
+    if (!isVerified) {
+      res.status(401).json({ message: 'User is not verified.' })
+      return
+    }
+    next()
+  } catch (err) {
+    res.json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    })
+  }
+}
+
+module.exports = { authorize, isAdmin, isUserVerified };

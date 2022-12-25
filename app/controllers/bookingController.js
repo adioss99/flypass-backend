@@ -42,13 +42,6 @@ const flight2Inc = [
   },
 ];
 
-const countTotalPrice = async (flight1, flight2, qty) => {
-  const Flight1 = await Flight.findByPk(flight1);
-  const Flight2 = flight2 !== undefined ? await Flight.findByPk(flight2) : 0;
-  const result = Flight1.price * qty + (Flight2 !== 0 ? Flight2.price : Flight2 * qty);
-  return result;
-};
-
 const bookingInc = [
   {
     model: Flight,

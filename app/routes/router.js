@@ -19,7 +19,7 @@ const {
 } = require('../controllers');
 
 const { nodeMailer } = require('../middleware')
-const { authorize, isAdmin } = require('../middleware/authorization');
+const { authorize, isAdmin, isUserVerified } = require('../middleware/authorization');
 const emailExist = require('../middleware/emailCheck');
 const uploadOnMemory = require('../middleware/uploadOnMemory');
 
@@ -104,7 +104,7 @@ router.put('/v1/notification/:id', authorize, notificationController.updateNotif
 router.delete('/v1/notification/:id', authorize, notificationController.deleteNotification);
 
 // wallet
-router.post('/v1/wallet', authorize, eWalletController.activateEwallet);
+router.post('/v1/wallet', authorize, isUserVerified, eWalletController.activateEwallet);
 router.get('/v1/wallet', authorize, eWalletController.getUserWalet);
 router.post('/v1/wallet/topup', authorize, eWalletController.topUpRequest);
 router.post('/v1/wallet/topup/confirm/:walletHistoryId', authorize, eWalletController.topUpConfirmation);
