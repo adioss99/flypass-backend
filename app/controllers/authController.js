@@ -224,7 +224,7 @@ const registerTest = (roles) => async (req, res, next) => {
 
     const emailConfirmation = await UserEmailConfirmation.create({
       userId: user.id,
-      token: randomstring.generate(32),
+      token: randomstring.generate(64),
     });
     res.status(200).json({ message: 'Register success.' });
     req.payload = { user, emailConfirmation };
