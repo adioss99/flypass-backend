@@ -77,7 +77,7 @@ const getalltransaction = async (req, res) => {
 
 const handlepayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findByPk(req.params.id);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
     await transaction.update({
@@ -100,7 +100,7 @@ const handlepayment = async (req, res) => {
 
 const handleConfirmPayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findByPk(req.params.id);
     await transaction.update({
       isPayed: true,
     });
@@ -131,7 +131,7 @@ const handleConfirmPayment = async (req, res) => {
 
 const handleRejectPayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findByPk(req.params.id);
     await transaction.update({
       isPayed: false,
     });
