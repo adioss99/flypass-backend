@@ -219,6 +219,30 @@ const getDetailWalletHistory = async (req, res) => {
   }
 }
 
+const changePassword = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const { oldPIN } = req.body;
+    const wallet = await getWallet(user);
+    const verify = await verificationPIN(wallet.pin, oldPIN);
+    if (!verify) {
+      res.status(401).json({ message: 'wrong PIN' });
+      return;
+    }
+    const { newPIN } = req.body;
+    const PIN = await encryptPIN(newPIN);
+    await wallet.update({ pin: PIN, userId: user });
+    res.status(200).json({ message: 'PIN changed successfully' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
 module.exports = {
   getUserWalet,
   topUpConfirmation,
@@ -227,4 +251,5 @@ module.exports = {
   topUpRequest,
   getWalletHistory,
   getDetailWalletHistory,
+  changePassword,
 };

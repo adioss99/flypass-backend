@@ -20,7 +20,7 @@ const {
 
 const { nodeMailer } = require('../middleware')
 const { authorize, isAdmin } = require('../middleware/authorization');
-const emailExist = require('../middleware/emailCheck');
+const { emailExist, emailNull } = require('../middleware/emailCheck');
 const uploadOnMemory = require('../middleware/uploadOnMemory');
 
 const router = express.Router();
@@ -28,7 +28,7 @@ const router = express.Router();
 router.get('/', getStarted);
 
 // image
-router.put('/v1/user', authorize, uploadOnMemory.single('image'), userController.updateProfiles);
+router.put('/v1/user', authorize, emailNull, uploadOnMemory.single('image'), userController.updateProfiles);
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 router.post('/v1/pay/create/:bookingId', uploadOnMemory.single('image'), transaction.transactionHandle);
@@ -54,9 +54,9 @@ router.get('/v1/gsiauth', authController.handleGoogleAuthUrl)
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb)
 router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle)
 router.post('/v1/googlelogin', authController.verifyIdToken, authController.handleLoginGoogle)
-router.post('/v1/login', authController.login);
-router.post('/v1/register', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
-router.post('/v1/register/admin', authorize, isAdmin, emailExist, authController.registerTest(1));
+router.post('/v1/login', emailNull, authController.login);
+router.post('/v1/register', emailNull, emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
+router.post('/v1/register/admin', emailNull, authorize, isAdmin, emailExist, authController.registerTest(1));
 router.post('/v1/verify?:token?', authController.handleEmailVerify);
 router.get('/v1/whoami', authorize, authController.whoAmI);
 router.get('/v1/refresh', authController.refreshToken);
@@ -110,6 +110,7 @@ router.post('/v1/wallet/topup/confirm/:walletHistoryId', authorize, eWalletContr
 router.post('/v1/wallet/payment/:bookingId', authorize, eWalletController.paymentHandler);
 router.get('/v1/wallet/history', authorize, eWalletController.getWalletHistory);
 router.get('/v1/wallet/history/:walletHistoryId', authorize, eWalletController.getDetailWalletHistory);
+router.post('/v1/wallet/changepin', authorize, eWalletController.changePassword)
 
 router.use(authController.onLost);
 router.use(authController.onError);
