@@ -100,7 +100,7 @@ const handlepayment = async (req, res) => {
 
 const handleConfirmPayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.bookingId);
     await transaction.update({
       isPayed: true,
     });
@@ -131,7 +131,7 @@ const handleConfirmPayment = async (req, res) => {
 
 const handleRejectPayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.bookingId);
     await transaction.update({
       isPayed: false,
     });

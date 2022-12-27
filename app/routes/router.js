@@ -93,8 +93,8 @@ router.delete('/v1/wishlist/:idflight', authorize, wishlistController.deleteWish
 // transcation
 router.get('/v1/pay/:bookingId', authorize, isAdmin, transaction.getBookingTransaction);
 router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction);
-router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
-router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
+router.put('/v1/pay/confirm/:bookingId', authorize, isAdmin, transaction.handleConfirmPayment);
+router.put('/v1/pay/reject/:bookingId', authorize, isAdmin, transaction.handleRejectPayment);
 
 // notification
 router.get('/v1/notification/admin', authorize, isAdmin, notificationController.getNotificationAdmin);
