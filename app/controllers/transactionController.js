@@ -75,20 +75,6 @@ const getalltransaction = async (req, res) => {
   }
 };
 
-const gettranscationId = async (req, res) => {
-  try {
-    const transaction = await Transaction.findByPk(req.params.id);
-    res.status(201).json({ transaction });
-  } catch (err) {
-    res.status(422).json({
-      error: {
-        name: err.name,
-        message: err.message,
-      },
-    });
-  }
-};
-
 const handlepayment = async (req, res) => {
   try {
     const transaction = await Transaction.findByPk(req.params.id);
@@ -175,7 +161,6 @@ const handleRejectPayment = async (req, res) => {
 
 module.exports = {
   handlepayment,
-  gettranscationId,
   getBookingTransaction,
   getalltransaction,
   handleConfirmPayment,
