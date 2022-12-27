@@ -32,6 +32,7 @@ router.put('/v1/user', authorize, emailNull, uploadOnMemory.single('image'), use
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 router.post('/v1/pay/create/:bookingId', uploadOnMemory.single('image'), transaction.transactionHandle);
+router.put('/v1/pay/updatepay/:id', uploadOnMemory.single('image'), transaction.handlepaymentbookingid);
 router.put('/v1/pay/updatepay/:bookingId', uploadOnMemory.single('image'), transaction.handlepayment);
 
 // >>>>>>>>>>>
@@ -95,6 +96,11 @@ router.get('/v1/pay/:bookingId', authorize, isAdmin, transaction.getBookingTrans
 router.get('/v1/pay/find/all', authorize, isAdmin, transaction.getalltransaction);
 router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmPayment);
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
+
+// by id
+router.get('/v1/pay/:id', authorize, isAdmin, transaction.getbyid);
+router.put('/v1/pay/confirm/:bookingId', authorize, isAdmin, transaction.handleConfirmPaymentbookingid)
+router.put('/v1/pay/reject/:bookingId', authorize, isAdmin, transaction.handleRejectPaymentbookingid)
 
 // notification
 router.get('/v1/notification/admin', authorize, isAdmin, notificationController.getNotificationAdmin);
