@@ -32,7 +32,7 @@ router.put('/v1/user', authorize, emailNull, uploadOnMemory.single('image'), use
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 router.post('/v1/pay/create/:bookingId', uploadOnMemory.single('image'), transaction.transactionHandle);
-router.put('/v1/pay/updatepay/:id', uploadOnMemory.single('image'), transaction.handlepayment);
+router.put('/v1/pay/updatepay/:bookingId', uploadOnMemory.single('image'), transaction.handlepayment);
 
 // >>>>>>>>>>>
 router.use(form.array());

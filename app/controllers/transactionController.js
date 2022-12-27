@@ -77,7 +77,7 @@ const getalltransaction = async (req, res) => {
 
 const handlepayment = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.bookingId);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
     await transaction.update({
