@@ -54,13 +54,13 @@ const bookingInc = [
     model: Flight,
     as: 'flight1',
     attributes: flightAttr,
-    include: flightInc, // kalo pake variable yang sama error
+    include: flightInc,
   },
   {
     model: Flight,
     as: 'flight2',
     attributes: flightAttr,
-    include: flight2Inc, // kalo pake variable yang sama error
+    include: flight2Inc,
   },
   {
     model: Passenger,
@@ -73,7 +73,7 @@ const bookingInc = [
   },
   {
     model: BookingStatus,
-  }
+  },
 ]
 
 const handleListBookings = async (req, res) => {
@@ -92,7 +92,7 @@ const handleListBookings = async (req, res) => {
   }
 };
 
-const handleBookFlight = async (req, res) => {
+const handleBookFlight = async (req, res, next) => {
   try {
     const user = userToken(req);
     const {
@@ -159,14 +159,17 @@ const handleBookFlight = async (req, res) => {
     );
 
     if (userId) {
-      createNotification('Need to be paid', booking.bookingCode, booking.id, false, userId);
+      await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
-    res.status(200).json({
+    const response = {
       booking,
       passengerContact,
       passenger,
       passengerBooking,
-    });
+    }
+    req.payload = response
+    res.status(200).json(response)
+    next()
   } catch (err) {
     res.status(422).json({
       error: {

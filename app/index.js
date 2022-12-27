@@ -15,17 +15,22 @@ const app = express();
 const server = createServer(app);
 
 const io = new Server(server, {
+  // transports: ['polling'],
   cors: {
     origin: '*',
   },
 });
+
+const users = [];
 io.on('connection', (socket) => {
-  io.to(1).emit('pesan-baru', 'halo')
-  // socket.emit('pesan-baru', 'halo')
-  socket.on('kirim-pesan', (pesan) => {
-    socket.broadcast.emit('pesan-baru', pesan);
+  socket.on('connected', (userId) => {
+    users[userId] = socket.id;
+  });
+  socket.on('connected', (room) => {
+    socket.join(room);
   });
 });
+
 global.io = io;
 
 app.use(
@@ -34,6 +39,9 @@ app.use(
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
   }),
 );
+
+app.set('views', `${__dirname}/middleware/mailer-templates/`)
+app.set('view engine', 'ejs');
 
 app.use(morgan('dev'));
 app.use(cookieParser());

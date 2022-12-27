@@ -1,12 +1,23 @@
 {
-  "web":{
-    "client_id":"969352521893-enn7oi1nnsjm78fjpblqh7nq2ssp5knm.apps.googleusercontent.com",
-    "project_id":"flypass-oauth-371406",
-    "auth_uri":"https://accounts.google.com/o/oauth2/auth",
-    "token_uri":"https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-    "client_secret":"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",
-    "redirect_uris":["https://localhost","https://localhost:3000","https://localhost:3000/v1/gsiauthcb","https://flypass-api.up.railway.app/"," "],
-    "javascript_origins":["https://localhost","https://localhost:3000","https://flypass-api.up.railway.app"]
+  "web": {
+    "client_id": "969352521893-enn7oi1nnsjm78fjpblqh7nq2ssp5knm.apps.googleusercontent.com",
+    "project_id": "flypass-oauth-371406",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "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",
+    "redirect_uris": [
+      "https://localhost:3000/",
+      "https://localhost:3000/v1/gsiauthcb",
+      "https://flypass-api.up.railway.app/",
+      "https://flypass-api.up.railway.app/v1/gsiauthcb",
+      "https://localhost:3000",
+      "https://localhost:3000/v1/gsiauthcb/"
+    ],
+    "javascript_origins": [
+      "https://localhost",
+      "https://localhost:3000",
+      "https://flypass-api.up.railway.app"
+    ]
   }
 }

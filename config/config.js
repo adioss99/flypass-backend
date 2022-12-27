@@ -12,6 +12,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    seederStorage: 'sequelize',
   },
   test: {
     username: DB_USERNAME,
@@ -20,6 +21,7 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    seederStorage: 'sequelize',
   },
   production: {
     username: DB_USERNAME,
@@ -28,5 +30,6 @@ module.exports = {
     host: DB_HOST,
     port: DB_PORT,
     dialect: 'postgres',
+    seederStorage: 'sequelize',
   },
 };

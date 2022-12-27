@@ -13488,7 +13488,7 @@ module.exports = {
         "country": "US"
       },
       {
-        "iata": null,
+        "iata": "EDC",
         "name": "Austin Executive Airport",
         "city": "Austin",
         "country": "US"
@@ -40173,5 +40173,7 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
+    await queryInterface.bulkDelete('Airports', null, { truncate: true, cascade: true, restartIdentity: true  })
+    
   }
 };
