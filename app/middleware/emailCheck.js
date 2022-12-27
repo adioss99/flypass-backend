@@ -10,4 +10,16 @@ const emailExist = async (req, res, next) => {
   next()
 }
 
-module.exports = emailExist;
+const emailNull = (req, res, next) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(401).json({ message: 'email can`t be empty' });
+    return;
+  }
+  next();
+};
+
+module.exports = {
+  emailExist,
+  emailNull,
+};
