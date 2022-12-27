@@ -47,9 +47,9 @@ const transactionHandle = async (req, res) => {
   }
 };
 
-const getBookingTransaction = async (req, res) => {
+const getbyid = async (req, res) => {
   try {
-    const transaction = await Transaction.findAll({ where: { bookingId: req.params.bookingId } });
+    const transaction = await Transaction.findAll({ where: { id: req.params.id } });
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
@@ -64,20 +64,6 @@ const getBookingTransaction = async (req, res) => {
 const getalltransaction = async (req, res) => {
   try {
     const transaction = await Transaction.findAll();
-    res.status(201).json({ transaction });
-  } catch (err) {
-    res.status(422).json({
-      error: {
-        name: err.name,
-        message: err.message,
-      },
-    });
-  }
-};
-
-const gettranscationId = async (req, res) => {
-  try {
-    const transaction = await Transaction.findByPk(req.params.id);
     res.status(201).json({ transaction });
   } catch (err) {
     res.status(422).json({
@@ -173,12 +159,114 @@ const handleRejectPayment = async (req, res) => {
   }
 };
 
+/// by bookingId
+const getBookingTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findAll({ where: { bookingId: req.params.bookingId } });
+    res.status(201).json({ transaction });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const handlepaymentbookingid = async (req, res) => {
+  try {
+    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const fileBase64 = req.file.buffer.toString('base64');
+    const img = await imageUploader(req, res, fileBase64);
+    await transaction.update({
+      Image: img[0],
+      imageId: img[1],
+      datePayed: new Date(),
+    })
+    res
+      .status(201)
+      .json({ message: 'updated successfully', transaction });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const handleConfirmPaymentbookingid = async (req, res) => {
+  try {
+    const transaction = await Transaction.findByPk(req.params.bookingId);
+    await transaction.update({
+      isPayed: true,
+    });
+
+    await Booking.update(
+      { bookingStatusId: 3 },
+      {
+        where: { id: transaction.bookingId },
+      },
+    );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment has been verificated', booking.bookingCode, booking.id, false, booking.userId);
+    }
+    res.status(201).json({
+      message: 'Payment Success',
+      transaction,
+    });
+  } catch (err) {
+    res.status(422).json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const handleRejectPaymentbookingid = async (req, res) => {
+  try {
+    const transaction = await Transaction.findByPk(req.params.bookingId);
+    await transaction.update({
+      isPayed: false,
+    });
+    await Booking.update(
+      { bookingStatusId: 4 },
+      {
+        where: { id: transaction.bookingId },
+      },
+    );
+    const booking = await findBooking(transaction.bookingId);
+    if (booking.userId) {
+      await createNotification('Your payment rejected', booking.bookingCode, booking.id, false, booking.userId);
+    }
+    res.status(201).json({
+      message: 'Payment rejected',
+      transaction,
+    });
+  } catch (err) {
+    res.status(422).json({
+      err: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 module.exports = {
   handlepayment,
-  gettranscationId,
   getBookingTransaction,
   getalltransaction,
   handleConfirmPayment,
   handleRejectPayment,
   transactionHandle,
+  getbyid,
+  handlepaymentbookingid,
+  handleConfirmPaymentbookingid,
+  handleRejectPaymentbookingid,
 };
