@@ -1,5 +1,8 @@
 const bcrypt = require('bcryptjs');
-const { Wallet, Booking, walletHistory } = require('../../models');
+const randomstring = require('randomstring');
+const {
+  Wallet, Booking, walletHistory, ResetPIN,
+} = require('../../models');
 const { createNotification } = require('./notificationController');
 
 function encryptPIN(pin) {
@@ -243,6 +246,53 @@ const changePassword = async (req, res) => {
   }
 }
 
+const resetPINreqeuest = async (req, res, next) => {
+  try {
+    const user = req.user.id;
+    const check = await Wallet.findOne({ where: { userId: user } });
+    if (!check) {
+      res.status(401).json({ message: 'activate your wallet first' });
+      return;
+    }
+    const mail = req.user.email;
+    const token = randomstring.generate(8);
+    const request = await ResetPIN.create({ email: mail, token });
+    req.payload = request;
+    res.status(201).json({ message: 'check your email' });
+    next();
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const consfirmNewPin = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { token, newPin } = req.body;
+    const request = await ResetPIN.findOne({ where: { token } });
+    if (!request) {
+      res.status(404).json({ message: 'invallid token' });
+      return;
+    }
+    const encryptedPIN = await encryptPIN(newPin);
+    await request.destroy();
+    await Wallet.update({ pin: encryptedPIN }, { where: { userId } });
+    res.status(201).json({ message: ' reset wallet PIN success' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 module.exports = {
   getUserWalet,
   topUpConfirmation,
@@ -252,4 +302,6 @@ module.exports = {
   getWalletHistory,
   getDetailWalletHistory,
   changePassword,
+  resetPINreqeuest,
+  consfirmNewPin,
 };
