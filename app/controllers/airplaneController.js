@@ -36,6 +36,10 @@ const getAirplane = async (req, res) => {
 const createAirplane = async (req, res) => {
   try {
     const { icao, model } = req.body;
+    if (!icao) {
+      res.status(401).json({ message: 'icao can`t be empty' });
+      return;
+    }
     const code = icao.toUpperCase();
     const check = await getIcao(code);
     if (check) {
@@ -60,6 +64,10 @@ const updateAirplane = async (req, res) => {
   try {
     const uId = parseInt(req.params.id, 10);
     const { icao, model } = req.body;
+    if (!icao) {
+      res.status(401).json({ message: 'icao can`t be empty' });
+      return;
+    }
     const code = icao.toUpperCase();
     const check = await getIcao(code);
     if (check && check.id !== uId) {
