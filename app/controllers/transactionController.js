@@ -176,7 +176,7 @@ const getBookingTransaction = async (req, res) => {
 
 const handlepaymentbookingid = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findOne(req.params.bookingId);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
     await transaction.update({
@@ -199,7 +199,7 @@ const handlepaymentbookingid = async (req, res) => {
 
 const handleConfirmPaymentbookingid = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findOne(req.params.bookingId);
     await transaction.update({
       isPayed: true,
     });
