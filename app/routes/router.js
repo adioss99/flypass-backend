@@ -42,6 +42,8 @@ router.use(form.array());
 router.get('/v1/user', authorize, userController.getProfile);
 router.get('/v1/getalluser', authorize, isAdmin, userController.getAlluser);
 router.put('/v1/changepassword', authorize, userController.changepassword);
+router.post('/v1/resetpassword', emailNull, userController.resetPassword, nodeMailer.sendResetPassword);
+router.post('/v1/resetpassword/confirm', userController.createNewPassword);
 
 // flight
 router.get('/v1/flights/search?:depDate?:depAirport?:arrAirport?', flightController.handleSearchFlight);
@@ -116,7 +118,9 @@ router.post('/v1/wallet/topup/confirm/:walletHistoryId', authorize, eWalletContr
 router.post('/v1/wallet/payment/:bookingId', authorize, eWalletController.paymentHandler);
 router.get('/v1/wallet/history', authorize, eWalletController.getWalletHistory);
 router.get('/v1/wallet/history/:walletHistoryId', authorize, eWalletController.getDetailWalletHistory);
-router.post('/v1/wallet/changepin', authorize, eWalletController.changePassword)
+router.post('/v1/wallet/changepin', authorize, eWalletController.changePassword);
+router.post('/v1/wallet/resetpin', authorize, eWalletController.resetPINreqeuest, nodeMailer.sendResetPIN);
+router.post('/v1/wallet/resetpin/confirm', authorize, eWalletController.consfirmNewPin);
 
 router.use(authController.onLost);
 router.use(authController.onError);
