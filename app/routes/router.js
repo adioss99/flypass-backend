@@ -28,7 +28,7 @@ const router = express.Router();
 router.get('/', getStarted);
 
 // image
-router.put('/v1/user', authorize, emailNull, uploadOnMemory.single('image'), userController.updateProfiles);
+router.put('/v1/user', authorize, uploadOnMemory.single('image'), emailNull, userController.updateProfiles);
 router.put('/v1/airlines/:id', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.updateAirline);
 router.post('/v1/airlines', authorize, isAdmin, uploadOnMemory.single('image'), airlineController.createAirline);
 router.post('/v1/pay/create/:bookingId', uploadOnMemory.single('image'), transaction.transactionHandle);
