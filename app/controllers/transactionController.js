@@ -159,6 +159,36 @@ const handleRejectPayment = async (req, res) => {
   }
 };
 
+const getDetailTransaction = async (req, res) => {
+  try {
+    const transaction = await Transaction.findByPk(req.params.id);
+    const detail = await Transaction.findAll({
+      where: { id: transaction.bookingId },
+      attributes: ['id', 'bookingId', 'isPayed', 'createdAt', 'updatedAt'],
+      order: [['updatedAt', 'DESC']],
+      include: {
+        model: Booking,
+        attributes: [
+          'id',
+          'bookingCode',
+          'passengerQty',
+          'totalPassengerBaggagePrice',
+          'userId',
+          'totalPrice',
+        ],
+      },
+    });
+    res.status(200).json({ detail });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 /// by bookingId
 const getBookingTransaction = async (req, res) => {
   try {
@@ -176,7 +206,7 @@ const getBookingTransaction = async (req, res) => {
 
 const handlepaymentbookingid = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findOne(req.params.bookingId);
     const fileBase64 = req.file.buffer.toString('base64');
     const img = await imageUploader(req, res, fileBase64);
     await transaction.update({
@@ -199,7 +229,7 @@ const handlepaymentbookingid = async (req, res) => {
 
 const handleConfirmPaymentbookingid = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.bookingId);
+    const transaction = await Transaction.findOne(req.params.bookingId);
     await transaction.update({
       isPayed: true,
     });
@@ -264,6 +294,7 @@ module.exports = {
   getalltransaction,
   handleConfirmPayment,
   handleRejectPayment,
+  getDetailTransaction,
   transactionHandle,
   getbyid,
   handlepaymentbookingid,

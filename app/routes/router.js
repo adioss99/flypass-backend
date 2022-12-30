@@ -100,9 +100,10 @@ router.put('/v1/pay/confirm/:id', authorize, isAdmin, transaction.handleConfirmP
 router.put('/v1/pay/reject/:id', authorize, isAdmin, transaction.handleRejectPayment);
 
 // by id
-router.get('/v1/pay/:id', authorize, isAdmin, transaction.getbyid);
+router.get('/v1/pay/transaction/:id', authorize, isAdmin, transaction.getbyid);
 router.put('/v1/pay/confirm/:bookingId', authorize, isAdmin, transaction.handleConfirmPaymentbookingid)
 router.put('/v1/pay/reject/:bookingId', authorize, isAdmin, transaction.handleRejectPaymentbookingid)
+router.get('/v1/pay/find/detail/:id', transaction.getDetailTransaction);
 
 // notification
 router.get('/v1/notification/admin', authorize, isAdmin, notificationController.getNotificationAdmin);
