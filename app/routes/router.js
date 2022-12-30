@@ -87,6 +87,7 @@ router.get('/v1/bookings/all', authorize, isAdmin, bookingController.handleListB
 router.get('/v1/bookings', bookingController.handleGetUserBooking)
 router.get('/v1/bookings/search?:bookingcode?', bookingController.handleSearchBookingByCode);
 router.delete('/v1/bookings')
+router.get('/v1/bookings/history', authorize, bookingController.historyBooking)
 
 // wishlist
 router.get('/v1/wishlist', authorize, wishlistController.getWishlist);
