@@ -234,7 +234,10 @@ const handleDeleteBooking = async (req, res) => {
 
 const historyBooking = async (req, res) => {
   try {
-    const history = await Booking.findAll({ where: { userId: req.user.id } })
+    const history = await Booking.findAll({
+      where: { userId: req.user.id },
+      include: bookingInc,
+    })
     res.status(200).json({ history })
   } catch (err) {
     res.status(404).json({
