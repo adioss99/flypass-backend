@@ -161,21 +161,13 @@ const handleRejectPayment = async (req, res) => {
 
 const getDetailTransaction = async (req, res) => {
   try {
-    const transaction = await Transaction.findByPk(req.params.id);
     const detail = await Transaction.findAll({
-      where: { id: transaction.bookingId },
+      where: { bookingId: req.params.bookingId },
       attributes: ['id', 'bookingId', 'isPayed', 'createdAt', 'updatedAt'],
       order: [['updatedAt', 'DESC']],
       include: {
         model: Booking,
-        attributes: [
-          'id',
-          'bookingCode',
-          'passengerQty',
-          'totalPassengerBaggagePrice',
-          'userId',
-          'totalPrice',
-        ],
+        attributes: ['id', 'bookingCode', 'passengerQty', 'totalPassengerBaggagePrice', 'userId', 'totalPrice'],
       },
     });
     res.status(200).json({ detail });
