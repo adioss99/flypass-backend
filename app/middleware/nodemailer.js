@@ -47,21 +47,28 @@ const sendEmailVerification = async (req, res) => {
 
 const sendBookingInfo = async (req, res) => {
   try {
-    const bookingData = req.bookingData.booking
-    const {
-      contactTitle, contactFirstName, contactLastName, contactEmail,
-    } = req.body
-    const context = {
-      name: `${contactTitle}. ${contactFirstName} ${contactLastName}`,
+    const { flight1, flight2 } = req.payload
+    if (!flight2) {
+      console.log('true!')
+    } else {
+      console.log('false!')
     }
-    // const info = await transporter.sendMail({
-    //   from: `"Flypass" <${MAILER_ACCOUNT}`, // sender address
-    //   to: `${contactEmail}`, // list of receivers
-    //   subject: 'Hello ✔', // Subject line
-    //   text: 'Hello world?', // plain text body
-    //   html: `<b>Yooooo {name}</b>${context}`,
-    // });
-    // console.log('Message sent: %s', info.messageId);
+    console.log(flight1.flightCode)
+    const { title, firstName, lastName, email } = req.payload.PassengerContact
+    const data = {
+      name: `${title}. ${firstName} ${lastName}`,
+      flight1,
+    }
+    if (flight2) {
+      data.flight2 = flight2
+    } else {
+      data.flight2 = 'undefined'
+    }
+    const html = await ejsHtml('bookingSend', data)
+    const subject = 'Your Booking Details!'
+    const info = await transporter.sendMail(mailOptions(email, subject, html))
+    console.log(html)
+    console.log('Message sent: %s', info.messageId);
   } catch (error) {
     console.error(error)
   }

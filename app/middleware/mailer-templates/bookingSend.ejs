@@ -1,12 +1,53 @@
-<div class="box">
-    <h3>We have received your bookings!</h1>
-        <p><b>Dear {{ titleName }}</b></p>
-        <div>
-            <p>Your flight reservation has been received. Please complete your payment within 24 hour.</p>
-            <p>You can find your reservation details below.</p>
-        </div>
-        <hr>
-        <h4>Departure Flights</h3>
-        <h5>Soekarno Hatta International Airport (CGK) - I Gusti Ngurah Rai International Airport (DPS)</h5>
-    </div>
-</div>
+<%-include('./includes/header.ejs') %>
+<tr>
+    <td class="wrapper">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <p>Hi there, <%- name %> </p>
+            <p>We have recevied your bookings</p>
+            <p>Please complete your payment</p>
+            <p></p>
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary";
+            white-space:nowrap;
+            ">
+              <tbody>
+                  <tr>
+                    <td>
+                        <p>Departure</p>
+                        <p><%= flight1.departureTime %></p>
+                        <p><%= flight1.departureAirport.name %></p>
+                    </td>
+                    <td>
+                        <p>bca</p>
+                        <p>bca</p>
+                        <p>bca</p>
+                    </td>
+                  </tr>
+                  <% if (flight2 === 'undefined') { %>
+                    <p>Let me tell you a secret: <b>I am an admin</b></p>
+                <% } else { %>
+                    
+                <% } %>
+
+                <tr>
+                  <td align="left">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                      <tbody>
+                        <tr>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p>This is a really simple email template. Its sole purpose is to get the recipient to click the button with no distractions.</p>
+            <p>Good luck! Hope it works.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+<%-include('./includes/footer.ejs') %>

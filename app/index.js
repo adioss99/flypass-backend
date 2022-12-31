@@ -40,8 +40,8 @@ app.use(
   }),
 );
 
-app.set('views', __dirname+'/middleware/mailer-templates/')
-app.set('view engine','ejs');
+app.set('views', `${__dirname}/middleware/mailer-templates/`)
+app.set('view engine', 'ejs');
 
 app.use(morgan('dev'));
 app.use(cookieParser());

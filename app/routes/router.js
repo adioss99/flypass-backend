@@ -53,7 +53,7 @@ router.delete('/v1/flights/:id', authorize, isAdmin, flightController.handleDele
 // auth
 router.get('/v1/gsiauth', authController.handleGoogleAuthUrl)
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb)
-router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle)
+router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle, nodeMailer.sendEmailVerification)
 router.post('/v1/googlelogin', authController.verifyIdToken, authController.handleLoginGoogle)
 router.post('/v1/login', authController.login);
 router.post('/v1/register', emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
@@ -112,7 +112,12 @@ router.post('/v1/wallet/payment/:bookingId', authorize, eWalletController.paymen
 router.get('/v1/wallet/history', authorize, eWalletController.getWalletHistory);
 router.get('/v1/wallet/history/:walletHistoryId', authorize, eWalletController.getDetailWalletHistory);
 
+router.get('/mail', ((req, res) => {
+  res.render('bookingSend')
+}))
+
 router.use(authController.onLost);
 router.use(authController.onError);
+
 
 module.exports = router;
