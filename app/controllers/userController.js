@@ -174,7 +174,7 @@ const createNewPassword = async (req, res) => {
       return;
     }
     const encryptedPassword = await encryptPassword(newPassword);
-    await request.destroy();
+    await ResetPasswordToken.destroy({ where: { userEmail: request.userEmail } });
     await User.update({ encryptedPassword }, { where: { email: request.userEmail } });
     res.status(201).json({ message: ' reset password success' });
   } catch (err) {
