@@ -24,7 +24,6 @@ const { emailExist, emailNull } = require('../middleware/emailCheck');
 const uploadOnMemory = require('../middleware/uploadOnMemory');
 
 const router = express.Router();
-
 router.get('/', getStarted);
 
 // image
@@ -56,7 +55,7 @@ router.delete('/v1/flights/:id', authorize, isAdmin, flightController.handleDele
 // auth
 router.get('/v1/gsiauth', authController.handleGoogleAuthUrl)
 router.get('/v1/gsiauthcb', authController.handleGoogleAuthCb)
-router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle)
+router.post('/v1/googleregister', authController.verifyIdToken, authController.handleRegisterGoogle, nodeMailer.sendEmailVerification)
 router.post('/v1/googlelogin', authController.verifyIdToken, authController.handleLoginGoogle)
 router.post('/v1/login', emailNull, authController.login);
 router.post('/v1/register', emailNull, emailExist, authController.registerTest(2), nodeMailer.sendEmailVerification);
@@ -124,7 +123,12 @@ router.post('/v1/wallet/changepin', authorize, eWalletController.changePassword)
 router.post('/v1/wallet/resetpin', authorize, eWalletController.resetPINreqeuest, nodeMailer.sendResetPIN);
 router.post('/v1/wallet/resetpin/confirm', authorize, eWalletController.consfirmNewPin);
 
+router.get('/mail', ((req, res) => {
+  res.render('bookingSend')
+}))
+
 router.use(authController.onLost);
 router.use(authController.onError);
+
 
 module.exports = router;

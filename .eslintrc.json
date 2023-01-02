@@ -9,7 +9,7 @@
   "parserOptions": {
     "ecmaVersion": "latest"
   },
-  "ignorePatterns": ["**/migrations", "**/models", "**/seeders"],
+  "ignorePatterns": ["**/migrations", "**/models", "**/seeders", "**/app/__test__"],
   "rules": {
     "linebreak-style": 0,
     "semi" : "off"
