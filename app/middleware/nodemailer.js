@@ -31,7 +31,6 @@ const sendEmailVerification = async (req, res) => {
   try {
     const { name, email } = req.payload.user
     const { token } = req.payload.emailConfirmation
-    console.log(name, email)
     const data = {
       name,
       token,
@@ -54,7 +53,9 @@ const sendBookingInfo = async (req, res) => {
       console.log('false!')
     }
     console.log(flight1.flightCode)
-    const { title, firstName, lastName, email } = req.payload.PassengerContact
+    const {
+      title, firstName, lastName, email,
+    } = req.payload.PassengerContact
     const data = {
       name: `${title}. ${firstName} ${lastName}`,
       flight1,

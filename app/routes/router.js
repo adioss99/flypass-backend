@@ -24,7 +24,6 @@ const emailExist = require('../middleware/emailCheck');
 const uploadOnMemory = require('../middleware/uploadOnMemory');
 
 const router = express.Router();
-
 router.get('/', getStarted);
 
 // image
