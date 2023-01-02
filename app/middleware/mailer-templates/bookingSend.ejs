@@ -1,12 +1,68 @@
-<div class="box">
-    <h3>We have received your bookings!</h1>
-        <p><b>Dear {{ titleName }}</b></p>
-        <div>
-            <p>Your flight reservation has been received. Please complete your payment within 24 hour.</p>
-            <p>You can find your reservation details below.</p>
-        </div>
-        <hr>
-        <h4>Departure Flights</h3>
-        <h5>Soekarno Hatta International Airport (CGK) - I Gusti Ngurah Rai International Airport (DPS)</h5>
-    </div>
-</div>
+<%-include('./includes/header.ejs') %>
+<tr>
+    <td class="wrapper">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td>
+            <p>Hi there, <%- name %> </p>
+            <p>We have recevied your bookings</p>
+            <p>Please complete your payment in 24 hours.</p>
+            <p></p>
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+              <tbody>
+                <p style="font-size: 16px; font-weight: bold;">Departure</p>
+                <p><%= flight1.Airline.name %> </p>
+                <table style="all: unset ">
+                  <tr>
+                    <td>
+                      <p><%= flight1.departureDate %> </p>
+                      <p><%= flight1.departureTime %></p>
+                      <p><%= flight1.departureAirport.name %></p>
+                    </td>
+                    <td>
+                      <p><%= flight1.arrivalDate %> </p>
+                      <p><%= flight1.arrivalTime %></p>
+                      <p><%= flight1.arrivalAirport.name %></p>
+                    </td>
+                  </tr>
+                </table>
+                  <% if (flight2 === 'undefined') { %>
+                    <br>
+                <% } else { %>
+                  <p style="font-size: 16px; font-weight: bold;">Return</p>
+                  <p><%= flight2.Airline.name %> </p>
+                  <table style="all: unset ">
+                    <tr>
+                      <td>
+                        <p><%= flight2.departureDate %> </p>
+                        <p><%= flight2.departureTime %></p>
+                        <p><%= flight2.departureAirport.name %></p>
+                      </td>
+                      <td>
+                        <p><%= flight2.arrivalDate %> </p>
+                        <p><%= flight2.arrivalTime %></p>
+                        <p><%= flight2.arrivalAirport.name %></p>
+                      </td>
+                    </tr>
+                  </table>
+                <% } %>
+
+                <tr>
+                  <td align="left">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                      <tbody>
+                        <tr>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+<%-include('./includes/footer.ejs') %>
