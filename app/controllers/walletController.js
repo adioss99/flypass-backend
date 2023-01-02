@@ -280,7 +280,7 @@ const consfirmNewPin = async (req, res) => {
       return;
     }
     const encryptedPIN = await encryptPIN(newPin);
-    await request.destroy();
+    await ResetPIN.destroy({ where: { email: request.email } });
     await Wallet.update({ pin: encryptedPIN }, { where: { userId } });
     res.status(201).json({ message: ' reset wallet PIN success' });
   } catch (err) {

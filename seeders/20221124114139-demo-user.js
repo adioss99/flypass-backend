@@ -16,6 +16,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Rigan Rahmadin',
@@ -25,6 +26,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Sasmito Adi',
@@ -34,6 +36,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Haikal Arif',
@@ -43,6 +46,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Syahbandar Pujangga',
@@ -52,6 +56,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Pahrurozi',
@@ -61,6 +66,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Zahir Abdul ',
@@ -70,6 +76,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Dwika Putra',
@@ -79,6 +86,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'Syifa Septiana',
@@ -88,6 +96,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
       {
         name: 'John Doe',
@@ -97,6 +106,7 @@ module.exports = {
         image: 'https://res.cloudinary.com/dgndyivi9/image/upload/v1671626833/Users-Administrator-icon_oxtg54.png',
         createdAt: timestamp,
         updatedAt: timestamp,
+        isVerified: true,
       },
     ]);
   },
