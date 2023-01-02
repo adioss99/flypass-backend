@@ -1,5 +1,9 @@
 const bcrypt = require('bcryptjs');
-const { Wallet, Booking, walletHistory } = require('../../models');
+const randomstring = require('randomstring');
+const {
+  Wallet, Booking, walletHistory, ResetPIN,
+} = require('../../models');
+const { createNotification } = require('./notificationController');
 
 function encryptPIN(pin) {
   return new Promise((resolve, reject) => {
@@ -46,7 +50,7 @@ const activateEwallet = async (req, res) => {
     const user = req.user.id;
     const check = await Wallet.findOne({ where: { userId: user } })
     if (check) {
-      res.status(401).json({ message: 'you already have a eWallet' });
+      res.status(401).json({ message: 'your wallet is active' });
       return
     }
     const { pin } = req.body;
@@ -67,6 +71,10 @@ const getUserWalet = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await Wallet.findOne({ where: { userId: user }, attributes: ['id', 'balance', 'createdAt', 'updatedAt'] });
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     res.status(200).json({ wallet });
   } catch (err) {
     res.status(422).json({
@@ -82,6 +90,10 @@ const topUpRequest = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     const { amount } = req.body;
     const request = await createHistory({
       walletId: wallet.id,
@@ -130,6 +142,10 @@ const paymentHandler = async (req, res) => {
     const { bookingId } = req.params;
     const { pin } = req.body;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     const verify = await verificationPIN(wallet.pin, pin);
     if (!verify) {
       res.status(401).json({ message: 'wrong PIN' });
@@ -149,6 +165,7 @@ const paymentHandler = async (req, res) => {
     });
     await book.update({ bookingStatusId: 3 });
     await wallet.decrement('balance', { by: book.totalPrice });
+    await createNotification('Your payment using wallet success', book.bookingCode, book.id, false, user);
     res.status(200).json({ message: 'payment success' });
   } catch (err) {
     res.status(422).json({
@@ -164,6 +181,10 @@ const getWalletHistory = async (req, res) => {
   try {
     const user = req.user.id;
     const wallet = await getWallet(user);
+    if (!wallet) {
+      res.status(401).json({ message: 'Please activate your wallet' });
+      return;
+    }
     const history = await walletHistory.findAll({
       where: { walletId: wallet.id },
       attributes: ['id', 'balance', 'type', 'status', 'updatedAt'],
@@ -201,6 +222,77 @@ const getDetailWalletHistory = async (req, res) => {
   }
 }
 
+const changePassword = async (req, res) => {
+  try {
+    const user = req.user.id;
+    const { oldPIN } = req.body;
+    const wallet = await getWallet(user);
+    const verify = await verificationPIN(wallet.pin, oldPIN);
+    if (!verify) {
+      res.status(401).json({ message: 'wrong PIN' });
+      return;
+    }
+    const { newPIN } = req.body;
+    const PIN = await encryptPIN(newPIN);
+    await wallet.update({ pin: PIN, userId: user });
+    res.status(200).json({ message: 'PIN changed successfully' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
+const resetPINreqeuest = async (req, res, next) => {
+  try {
+    const user = req.user.id;
+    const check = await Wallet.findOne({ where: { userId: user } });
+    if (!check) {
+      res.status(401).json({ message: 'activate your wallet first' });
+      return;
+    }
+    const mail = req.user.email;
+    const token = randomstring.generate(8);
+    const request = await ResetPIN.create({ email: mail, token });
+    req.payload = request;
+    res.status(201).json({ message: 'check your email' });
+    next();
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const consfirmNewPin = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { token, newPin } = req.body;
+    const request = await ResetPIN.findOne({ where: { token } });
+    if (!request) {
+      res.status(404).json({ message: 'invallid token' });
+      return;
+    }
+    const encryptedPIN = await encryptPIN(newPin);
+    await ResetPIN.destroy({ where: { email: request.email } });
+    await Wallet.update({ pin: encryptedPIN }, { where: { userId } });
+    res.status(201).json({ message: ' reset wallet PIN success' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+};
+
 module.exports = {
   getUserWalet,
   topUpConfirmation,
@@ -209,4 +301,7 @@ module.exports = {
   topUpRequest,
   getWalletHistory,
   getDetailWalletHistory,
+  changePassword,
+  resetPINreqeuest,
+  consfirmNewPin,
 };

@@ -17,7 +17,7 @@ const {
   BookingStatus,
 } = require('../../models');
 const { createNotification } = require('./notificationController');
-const { flightInc, flightAttr } = require('./flightController'); // error kalo 2-2nya include pake import
+const { flightInc, flightAttr } = require('./flightController');
 
 const flight2Inc = [
   {
@@ -92,7 +92,7 @@ const handleListBookings = async (req, res) => {
   }
 };
 
-const handleBookFlight = async (req, res) => {
+const handleBookFlight = async (req, res, next) => {
   try {
     const user = userToken(req);
     const {
@@ -161,12 +161,15 @@ const handleBookFlight = async (req, res) => {
     if (userId) {
       await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
-    res.status(200).json({
+    const response = {
       booking,
       passengerContact,
       passenger,
       passengerBooking,
-    });
+    }
+    req.payload = response
+    res.status(200).json(response)
+    next()
   } catch (err) {
     res.status(422).json({
       error: {
@@ -229,6 +232,23 @@ const handleDeleteBooking = async (req, res) => {
   res.status(204).end();
 };
 
+const historyBooking = async (req, res) => {
+  try {
+    const history = await Booking.findAll({
+      where: { userId: req.user.id },
+      include: bookingInc,
+    })
+    res.status(200).json({ history })
+  } catch (err) {
+    res.status(404).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
 const userToken = (req) => {
   try {
     const token = req.headers.authorization?.split('Bearer ')[1];
@@ -288,4 +308,5 @@ module.exports = {
   handleGetUserBooking,
   handleSearchBookingByCode,
   handleDeleteBooking,
+  historyBooking,
 };
