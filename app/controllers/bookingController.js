@@ -167,7 +167,10 @@ const handleBookFlight = async (req, res, next) => {
       passenger,
       passengerBooking,
     }
-    req.payload = response
+    const bookingDetails = await Booking.findByPk(booking.id, {
+      include: bookingInc,
+    });
+    req.payload = bookingDetails
     res.status(200).json(response)
     next()
   } catch (err) {

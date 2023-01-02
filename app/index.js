@@ -49,7 +49,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(routes);
-
 server.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });

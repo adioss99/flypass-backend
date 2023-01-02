@@ -99,7 +99,7 @@ const verifyIdToken = async (req, res, next) => {
   }
 };
 
-const handleRegisterGoogle = async (req, res) => {
+const handleRegisterGoogle = async (req, res, next) => {
   const data = res.payload;
   const {
     name, birthDate, gender, phone,
@@ -135,7 +135,13 @@ const handleRegisterGoogle = async (req, res) => {
       googleId: data.sub,
       roleId: 2,
     });
-    res.status(200).json({ msg: 'Registered succesfully.' });
+    const emailConfirmation = await UserEmailConfirmation.create({
+      userId: user.id,
+      token: randomstring.generate(32),
+    });
+    res.status(200).json({ message: 'Register success.' });
+    req.payload = { user, emailConfirmation };
+    next()
   } catch (err) {
     res.status(400).json({
       err: {
@@ -146,7 +152,7 @@ const handleRegisterGoogle = async (req, res) => {
   }
 };
 
-const handleLoginGoogle = async (req, res) => {
+const handleLoginGoogle = async (req, res, next) => {
   try {
     const data = res.payload;
 
