@@ -54,8 +54,13 @@ const getAirline = async (req, res) => {
 
 const createAirline = async (req, res) => {
   try {
+    const isNull = req.body.iata;
+    if (!isNull) {
+      res.status(401).json({ message: 'iata can`t be empty' });
+      return;
+    }
     const { name } = req.body;
-    const iata = req.body.iata.toUpperCase();
+    const iata = isNull.toUpperCase();
     const check = await checkIata(req, res, iata);
     if (check[0]) {
       res.status(406).json({ message: 'iata existed' });
@@ -104,7 +109,12 @@ const deleteAirline = async (req, res) => {
 const updateAirline = async (req, res) => {
   try {
     const { name } = req.body;
-    const iata = req.body.iata.toUpperCase();
+    const isNull = req.body.iata;
+    if (!isNull) {
+      res.status(401).json({ message: 'iata can`t be empty' });
+      return;
+    }
+    const iata = isNull.toUpperCase();
     const data = await getData(req.params.id);
     const check = await checkIata(req, res, iata);
 

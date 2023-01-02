@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
-const { User, Role } = require('../../models');
+const randomstring = require('randomstring');
+const { User, Role, ResetPasswordToken } = require('../../models');
 const cloudinary = require('../utils/cloudinary');
 
 const SALT = 10;
@@ -124,7 +125,6 @@ const changepassword = async (req, res) => {
 
     await User.update(
       {
-        olddpassword,
         encryptedPassword,
       },
       { where: { id: userId } },
@@ -142,9 +142,56 @@ const changepassword = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res, next) => {
+  try {
+    const mail = req.body.email.toLowerCase();
+    const user = await User.findOne({ where: { email: mail } });
+    if (!user) {
+      res.status(404).json({ message: 'user not found' });
+      return;
+    }
+    const token = randomstring.generate(8);
+    const request = await ResetPasswordToken.create({ userEmail: user.email, token });
+    req.payload = request;
+    res.status(201).json({ message: 'check your email' });
+    next();
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
+const createNewPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body
+    const request = await ResetPasswordToken.findOne({ where: { token } });
+    if (!request) {
+      res.status(404).json({ message: 'invallid token' });
+      return;
+    }
+    const encryptedPassword = await encryptPassword(newPassword);
+    await ResetPasswordToken.destroy({ where: { userEmail: request.userEmail } });
+    await User.update({ encryptedPassword }, { where: { email: request.userEmail } });
+    res.status(201).json({ message: ' reset password success' });
+  } catch (err) {
+    res.status(422).json({
+      error: {
+        name: err.name,
+        message: err.message,
+      },
+    });
+  }
+}
+
 module.exports = {
   updateProfiles,
   changepassword,
   getProfile,
   getAlluser,
+  resetPassword,
+  createNewPassword,
 };
