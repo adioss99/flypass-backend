@@ -1,10 +1,5 @@
 const { Airport } = require('../../models');
 
-const getData = async (unique) => {
-  const data = await Airport.findByPk(unique);
-  return data;
-};
-
 const getAirport = async (req, res) => {
   try {
     const airport = await Airport.findAll();
@@ -20,6 +15,5 @@ const getAirport = async (req, res) => {
 };
 
 module.exports = {
-  getData,
   getAirport,
 };
