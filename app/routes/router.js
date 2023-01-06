@@ -130,5 +130,4 @@ router.get('/mail', ((req, res) => {
 router.use(authController.onLost);
 router.use(authController.onError);
 
-
 module.exports = router;
