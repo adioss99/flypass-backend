@@ -15,7 +15,6 @@ const app = express();
 const server = createServer(app);
 
 const io = new Server(server, {
-  // transports: ['polling'],
   cors: {
     origin: '*',
   },
