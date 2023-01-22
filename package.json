@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./app/index.js",
+    "start": "node ./app/index.js",
+    "dev": "nodemon ./app/index.js",
     "test": "jest --coverage",
     "db:create": "sequelize db:create",
     "db:drop": "sequelize db:drop",
