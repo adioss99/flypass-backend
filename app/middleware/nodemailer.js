@@ -46,12 +46,6 @@ const sendEmailVerification = async (req, res) => {
 const sendBookingInfo = async (req, res) => {
   try {
     const { flight1, flight2 } = req.payload
-    if (!flight2) {
-      console.log('true!')
-    } else {
-      console.log('false!')
-    }
-    console.log(flight1.flightCode)
     const {
       title, firstName, lastName, email,
     } = req.payload.PassengerContact
@@ -67,8 +61,6 @@ const sendBookingInfo = async (req, res) => {
     const html = await ejsHtml('bookingSend', data)
     const subject = 'Your Booking Details!'
     const info = await transporter.sendMail(mailOptions(email, subject, html))
-    console.log(html)
-    console.log('Message sent: %s', info.messageId);
   } catch (error) { /* empty */ }
 }
 
