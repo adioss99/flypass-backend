@@ -92,7 +92,7 @@ const handleListBookings = async (req, res) => {
   }
 };
 
-const handleBookFlight = async (req, res, next) => {
+const handleBookFlight = async (req, res) => {
   try {
     const user = userToken(req);
     const {
@@ -103,8 +103,15 @@ const handleBookFlight = async (req, res, next) => {
       contactEmail,
       flight1Id,
       flight2Id,
+      passenger,
     } = req.body;
 
+    // Validate input data
+    if (!contactTitle || !contactFirstName || !contactLastName || !contactEmail || !flight1Id) {
+      return res.status(400).json({ error: 'Missing required data' });
+    }
+
+    // Create passenger contact
     const passengerContact = await PassengerContact.create({
       title: contactTitle,
       firstName: contactFirstName,
@@ -113,68 +120,75 @@ const handleBookFlight = async (req, res, next) => {
       email: contactEmail,
     });
 
-    const passengerData = req.body.passenger;
-    const passenger = await Passenger.bulkCreate(passengerData);
-    const passengerBaggages = passenger
-      .map((passengers) => passengers.baggage)
-      .filter((baggages) => baggages !== null)
-      .map((baggage) => baggage.map(baggageMultiplier));
+    // Create passengers and calculate baggage prices
+    const passengerData = passenger || [];
+    const passengerPromises = passengerData.map(async (data) => {
+      const passenger = await Passenger.create(data);
+      return passenger;
+    });
+    const passengers = await Promise.all(passengerPromises);
+    const passengerBaggages = passengers
+      .map((passenger) => passenger.baggage || 0)
+      .reduce((acc, baggage) => acc + baggage, 0);
 
-    const flightPrice = await Promise.all(
-      [flight1Id, flight2Id].filter((e) => e !== undefined).map(getPrice),
-    );
+    // Get flight prices
+    const flightIds = [flight1Id, flight2Id].filter((id) => id !== undefined);
+    const flightPricePromises = flightIds.map(getPrice);
+    const flightPrices = await Promise.all(flightPricePromises);
 
-    const passengerQty = passenger.length;
+    // Calculate total passenger baggage price
+    const passengerQty = passengers.length;
     const totalPassengerBaggagePrice = countBaggagePrice(
       passengerBaggages,
-      flightPrice,
-      passengerQty,
+      flightPrices,
+      passengerQty
     );
 
-    const totalPrice = flightPrice.map((e) => e * passengerQty).reduce((a, b) => a + b)
-      + totalPassengerBaggagePrice;
+    // Calculate total price
+    const totalPrice = flightPrices.reduce((acc, price) => acc + price, 0) +
+      (totalPassengerBaggagePrice || 0);
 
-    const userId = user !== null ? user.id : user;
+    // Create booking
+    const userId = user ? user.id : null;
     const booking = await Booking.create({
       bookingCode: randomstring.generate({ length: 10, charset: 'alphabetic' }),
       flight1Id,
       flight2Id,
-      roundtrip: flight2Id != null,
+      roundtrip: !!flight2Id,
       userId,
       passengerContactId: passengerContact.id,
       bookingStatusId: 1,
       passengerQty,
-      totalPassengerBaggagePrice:
-        totalPassengerBaggagePrice !== null ? totalPassengerBaggagePrice : 0,
+      totalPassengerBaggagePrice: totalPassengerBaggagePrice || 0,
       totalPrice,
     });
 
-    const passengerBookingData = passenger.map((e) => ({
-      passengerId: e.id,
+    // Create passenger bookings
+    const passengerBookingData = passengers.map((passenger) => ({
+      passengerId: passenger.id,
       bookingId: booking.id,
     }));
+    await PassengerBooking.bulkCreate(passengerBookingData);
 
-    const passengerBooking = await PassengerBooking.bulkCreate(
-      passengerBookingData,
-    );
-
+    // Create notification if user is authenticated
     if (userId) {
       await createNotification('Waiting for payment', booking.bookingCode, booking.id, false, userId);
     }
+
+    // Construct response
     const response = {
       booking,
       passengerContact,
-      passenger,
-      passengerBooking,
-    }
-    const bookingDetails = await Booking.findByPk(booking.id, {
-      include: bookingInc,
-    });
-    req.payload = bookingDetails
-    res.status(200).json(response)
-    next()
+      passengers,
+    };
+
+    // Return booking details
+    const bookingDetails = await Booking.findByPk(booking.id, { include: bookingInc });
+    req.payload = bookingDetails;
+    return res.status(200).json(response);
   } catch (err) {
-    res.status(422).json({
+    console.error('Error:', err);
+    return res.status(422).json({
       error: {
         name: err.name,
         message: err.message,

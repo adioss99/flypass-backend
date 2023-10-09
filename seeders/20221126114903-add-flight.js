@@ -11,7 +11,7 @@ module.exports = {
      
      }
      const generateFlights = (departureAirportId, arrivalAirportId, duration, flightTypeId) => {
-      const randomDate = moment(momentRandom('20230107', '20221207')).format('YYYY-MM-DD')
+      const randomDate = moment(momentRandom('20240107', '20231207')).format('YYYY-MM-DD')
       const randomTime = moment().hour((RandomMinMax(1, 12)))
       const dur = moment.utc(duration, 'hh:mm').format('hh:mm')
       const data = {

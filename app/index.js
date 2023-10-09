@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const routes = require('./routes/router');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 8000 } = process.env;
 const app = express();
 const server = createServer(app);
 
