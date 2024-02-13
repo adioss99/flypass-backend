@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
-const { google } = require('googleapis');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const randomstring = require('randomstring');
-const { Op } = require('sequelize');
-const { User, UserEmailConfirmation } = require('../../models');
+const { google } = require("googleapis");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const randomstring = require("randomstring");
+const { Op } = require("sequelize");
+const { User, UserEmailConfirmation } = require("../../models");
 
 const SALT = 10;
 
@@ -19,7 +19,7 @@ const {
 const oauth2Client = new google.auth.OAuth2(
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URL,
+  GOOGLE_REDIRECT_URL
 );
 
 function encryptPassword(password) {
@@ -48,25 +48,25 @@ function checkPassword(encryptedPassword, password) {
 
 function createToken(payload) {
   const access = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '6h',
+    expiresIn: "6h",
   });
   const refresh = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: '7d',
+    expiresIn: "7d",
   });
   return [access, refresh];
 }
 
 const handleGoogleAuthUrl = async (req, res) => {
   const scopes = [
-    'https://www.googleapis.com/auth/userinfo.email',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'openid',
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "openid",
   ];
   try {
     const url = oauth2Client.generateAuthUrl({
-      access_type: 'offline',
+      access_type: "offline",
       scope: scopes,
-      prompt: 'consent',
+      prompt: "consent",
     });
     res.status(200).json(url);
   } catch (err) {
@@ -101,9 +101,7 @@ const verifyIdToken = async (req, res, next) => {
 
 const handleRegisterGoogle = async (req, res, next) => {
   const data = res.payload;
-  const {
-    name, birthDate, gender, phone,
-  } = req.body;
+  const { name, birthDate, gender, phone } = req.body;
   try {
     const isUser = await User.findOne({
       where: {
@@ -118,11 +116,9 @@ const handleRegisterGoogle = async (req, res, next) => {
       },
     });
     if (isUser) {
-      res
-        .status(400)
-        .json({
-          message: 'You already have an account registered with this email',
-        });
+      res.status(400).json({
+        message: "You already have an account registered with this email",
+      });
       return;
     }
     const user = await User.create({
@@ -139,9 +135,9 @@ const handleRegisterGoogle = async (req, res, next) => {
       userId: user.id,
       token: randomstring.generate(32),
     });
-    res.status(200).json({ message: 'Register success.' });
+    res.status(200).json({ message: "Register success." });
     req.payload = { user, emailConfirmation };
-    next()
+    next();
   } catch (err) {
     res.status(400).json({
       err: {
@@ -161,7 +157,7 @@ const handleLoginGoogle = async (req, res, next) => {
     });
 
     if (!user) {
-      res.status(404).json({ message: 'Email not found' });
+      res.status(404).json({ message: "Email not found" });
       return;
     }
 
@@ -177,7 +173,7 @@ const handleLoginGoogle = async (req, res, next) => {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
-    const accesstToken = token[0];
+    const accessToken = token[0];
     const refreshToken = token[1];
     await User.update(
       { refreshToken },
@@ -185,18 +181,18 @@ const handleLoginGoogle = async (req, res, next) => {
         where: {
           id: user.id,
         },
-      },
+      }
     );
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.status(201).json({
-      message: 'login success',
+      message: "login success",
       user: {
         id: user.id,
         email: user.email,
-        accesstToken,
+        accessToken,
       },
     });
   } catch (err) {
@@ -208,12 +204,11 @@ const handleLoginGoogle = async (req, res, next) => {
 
 const registerTest = (roles) => async (req, res, next) => {
   const email = req.body.email.toLowerCase();
-  const {
-    name, password, confirmationPassword, birthDate, gender, phone,
-  } = req.body;
+  const { name, password, confirmationPassword, birthDate, gender, phone } =
+    req.body;
   const role = roles !== 1 || null ? 2 : 1;
   if (password !== confirmationPassword) {
-    res.status(401).json({ message: 'password doesn`t match' });
+    res.status(401).json({ message: "password doesn`t match" });
   }
   try {
     const encryptedPassword = await encryptPassword(password);
@@ -232,7 +227,7 @@ const registerTest = (roles) => async (req, res, next) => {
       userId: user.id,
       token: randomstring.generate(64),
     });
-    res.status(200).json({ message: 'Register success.' });
+    res.status(200).json({ message: "Register success." });
     req.payload = { user, emailConfirmation };
     next();
   } catch (err) {
@@ -242,12 +237,11 @@ const registerTest = (roles) => async (req, res, next) => {
 
 const register = async (req, res, roles) => {
   const email = req.body.email.toLowerCase();
-  const {
-    name, password, confirmationPassword, birthDate, gender, phone,
-  } = req.body;
+  const { name, password, confirmationPassword, birthDate, gender, phone } =
+    req.body;
   const role = roles !== 1 ? 2 : 1;
   if (password !== confirmationPassword) {
-    res.status(401).json({ message: 'password doesn`t match' });
+    res.status(asd).json({ message: "password doesn`t match" });
     return;
   }
   try {
@@ -262,7 +256,7 @@ const register = async (req, res, roles) => {
       phone,
       roleId: role,
     });
-    res.status(200).json('Register success');
+    res.status(200).json("Register success");
   } catch (err) {
     res.status(400).json({ err: { name: err.name, message: err.message } });
   }
@@ -281,17 +275,17 @@ const login = async (req, res) => {
   });
 
   if (!user) {
-    res.status(404).json({ message: 'Email not found' });
+    res.status(404).json({ message: "Email not found" });
     return;
   }
 
   const isPasswordCorrect = await checkPassword(
     user.encryptedPassword,
-    password,
+    password
   );
 
   if (!isPasswordCorrect) {
-    res.status(401).json({ message: 'Wrong password!' });
+    res.status(401).json({ message: "Wrong password!" });
     return;
   }
 
@@ -307,7 +301,7 @@ const login = async (req, res) => {
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   });
-  const accesstToken = token[0];
+  const accessToken = token[0];
   const refreshToken = token[1];
   await User.update(
     { refreshToken },
@@ -315,18 +309,19 @@ const login = async (req, res) => {
       where: {
         id: user.id,
       },
-    },
+    }
   );
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
-  res.status(201).json({
-    message: 'login success',
+  res.status(200).json({
+    message: "login success",
     user: {
       id: user.id,
       email: user.email,
-      accesstToken,
+      role: user.roleId,
+      accessToken,
     },
   });
 };
@@ -337,11 +332,12 @@ const whoAmI = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    const refreshToken = req.body.refreshToken === undefined || req.body.refreshToken === null
-      ? req.cookies.refreshToken
-      : req.body.refreshToken;
+    const refreshToken =
+      req.body.refreshToken === undefined || req.body.refreshToken === null
+        ? req.cookies.refreshToken
+        : req.body.refreshToken;
     if (!refreshToken) {
-      res.status(204).send('null');
+      res.status(204).send("null");
       return;
     }
     const user = await User.findAll({
@@ -350,7 +346,7 @@ const logout = async (req, res) => {
       },
     });
     if (!user[0]) {
-      res.status(204).send('notfound');
+      res.status(204).send("notfound");
       return;
     }
     const userId = user[0].id;
@@ -360,12 +356,13 @@ const logout = async (req, res) => {
         where: {
           id: userId,
         },
-      },
+      }
     );
-    res.clearCookie('refreshToken');
-    res.status(200).json('Log out success');
+    res.clearCookie("refreshToken");
+    res.setHeader("Clear-Site-Data", '"cookies"');
+    res.status(200).json("Log out success");
   } catch (error) {
-    res.status(400).json({ msg: 'Something went wrong' });
+    res.status(400).json({ msg: "Something went wrong" });
   }
 };
 
@@ -391,9 +388,7 @@ const refreshToken = async (req, res) => {
         return;
       }
       const userId = user.id;
-      const {
-        email, createdAt, updatedAt, roleId,
-      } = user;
+      const { email, createdAt, updatedAt, roleId } = user;
       const accessToken = jwt.sign(
         {
           id: user.id,
@@ -409,8 +404,8 @@ const refreshToken = async (req, res) => {
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-          expiresIn: '6h',
-        },
+          expiresIn: "6h",
+        }
       );
       res.json({
         userId,
@@ -438,7 +433,7 @@ const handleEmailVerify = async (req, res) => {
     });
 
     if (!isTokenValid) {
-      res.status(400).json({ message: 'Invalid email verification Token!' });
+      res.status(400).json({ message: "Invalid email verification Token!" });
       return;
     }
 
@@ -448,9 +443,9 @@ const handleEmailVerify = async (req, res) => {
         where: {
           id: isTokenValid.userId,
         },
-      },
+      }
     );
-    res.status(200).json({ message: 'Email verification success' });
+    res.status(200).json({ message: "Email verification success" });
   } catch (err) {
     res.status(400).json({
       error: {
@@ -477,13 +472,13 @@ module.exports = {
   refreshToken,
   onLost(_req, res) {
     res.status(404).json({
-      status: 'FAIL',
-      message: 'Route not found!',
+      status: "FAIL",
+      message: "Route not found!",
     });
   },
   onError(err, _req, res, _next) {
     res.status(500).json({
-      status: 'ERROR',
+      status: "ERROR",
       error: {
         name: err.name,
         message: err.message,

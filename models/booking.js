@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.walletHistory, {
         foreignKey: 'bookingId',
       });
+      this.hasOne(models.Transaction, {
+        foreignKey: 'bookingId'
+      })
     }
   }
   Booking.init({
